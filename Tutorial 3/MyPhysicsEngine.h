@@ -182,7 +182,7 @@ namespace PhysicsEngine
 	class MyScene : public Scene
 	{
 		Plane* plane;
-		Box* box, * box2;
+		Box* Board, * box, * box2;
 		Sphere* ball;
 		MySimulationEventCallback* my_callback;
 		
@@ -212,6 +212,12 @@ namespace PhysicsEngine
 			plane = new Plane();
 			plane->Color(PxVec3(210.f/255.f,210.f/255.f,210.f/255.f));
 			Add(plane);
+
+			Board = new Box(PxTransform(PxVec3(10.0f, 10.5f, 10.0f),));
+			Board->Color(color_palette[0]);
+			Board->Name("Board");
+			Add(Board);
+
 
 			box = new Box(PxTransform(PxVec3(.0f,.5f,.0f)));
 			box->Color(color_palette[0]);
