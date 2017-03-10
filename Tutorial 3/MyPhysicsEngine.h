@@ -183,6 +183,7 @@ namespace PhysicsEngine
 	{
 		Plane* plane;
 		Box* box, * box2;
+		Sphere* ball;
 		MySimulationEventCallback* my_callback;
 		
 	public:
@@ -223,12 +224,24 @@ namespace PhysicsEngine
 			box->Name("Box1");
 			Add(box);
 
-			/*
+			box2 = new Box(PxTransform(PxVec3(.0f, 12.5f, .0f)));
+			box2->Color(color_palette[1]);
+			box2->Name("Box2");
+			Add(box2);
+
+
+			ball = new Sphere(PxTransform(PxVec3(.0f, 13.5f, .0f)));
+			ball->Color(color_palette[1]);
+			ball->Name("Ball");
+			Add(ball);
+		
+
+			
 			//joint two boxes together
 			//the joint is fixed to the centre of the first box, oriented by 90 degrees around the Y axis
 			//and has the second object attached 5 meters away along the Y axis from the first object.
-			RevoluteJoint joint(box, PxTransform(PxVec3(0.f,0.f,0.f),PxQuat(PxPi/2,PxVec3(0.f,1.f,0.f))), box2, PxTransform(PxVec3(0.f,5.f,0.f)));
-			*/
+			RevoluteJoint joint(box, PxTransform(PxVec3(0.f,0.f,0.f), PxQuat(PxPi/2,PxVec3(0.f,1.f,0.f))), box2, PxTransform(PxVec3(0.f,5.f,0.f)));
+			
 		}
 
 		//Custom udpate function
