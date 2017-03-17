@@ -196,6 +196,8 @@ namespace PhysicsEngine
 		{
 			px_scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
 			px_scene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
+			px_scene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 1.0f);
+			px_scene->setVisualizationParameter(PxVisualizationParameter::eBODY_LIN_VELOCITY, 1.0f);
 		}
 
 		//Custom scene initialisation
@@ -213,20 +215,22 @@ namespace PhysicsEngine
 			plane->Color(PxVec3(210.f/255.f,210.f/255.f,210.f/255.f));
 			Add(plane);
 
-			Board = new Box(PxTransform(PxVec3(10.0f, 10.5f, 10.0f),));
+			Board = new Box(PxTransform(PxVec3(10.0f, 0.5f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))),PxVec3(1.0f,10.0f,1.0f));
 			Board->Color(color_palette[0]);
 			Board->Name("Board");
+			//Board->GetShape(0)->setLocalPose(PxTransform(PxVec3(10.0f, 5.0f, 0.0f),PxQuat(PxHalfPi,PxVec3(0.0f, 0.0f, 0.0f))));
 			Add(Board);
 
 
-			box = new Box(PxTransform(PxVec3(.0f,.5f,.0f)));
-			box->Color(color_palette[0]);
 			//set collision filter flags
 			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
 			//use | operator to combine more actors e.g.
 			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2);
 			//don't forget to set your flags for the matching actor as well, e.g.:
 			// box2->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
+
+			box = new Box(PxTransform(PxVec3(.0f,.5f,.0f)));
+			box->Color(color_palette[0]);
 			box->Name("Box1");
 			Add(box);
 
