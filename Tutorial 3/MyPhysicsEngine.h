@@ -227,7 +227,7 @@ namespace PhysicsEngine
 			Board->Color(color_palette[0]);
 			Board->Name("Board");
 			//Board->GetShape(0)->setLocalPose(PxTransform(PxVec3(10.0f, 5.0f, 0.0f),PxQuat(PxHalfPi,PxVec3(0.0f, 0.0f, 0.0f))));
-			Add(Board);
+			//Add(Board);
 
 			Paddle1 = new Pyramid(PxTransform(PxVec3(0.0f, 5.0f, 5.0f)));
 			Paddle1->Color(color_palette[0]);
@@ -235,12 +235,12 @@ namespace PhysicsEngine
 			Add(Paddle1);
 
 			Paddle2 = new Pyramid(PxTransform(PxVec3(0.0f, 5.0f, 10.0f)));
-			Paddle2->Color(color_palette[0]);
+			Paddle2->Color(color_palette[1]);
 			Paddle2->Name("Paddle2");
 			Add(Paddle2);
 
-			RevoluteJoint paddleLeft(NULL, PxTransform(PxVec3(-1.0f,1.0f,0.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f))), Paddle1, PxTransform(PxVec3(0.f, -5.0f, 0.f)));
-			RevoluteJoint paddleRight(NULL, PxTransform(PxVec3(1.0f,1.0f,0.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f))), Paddle2, PxTransform(PxVec3(0.f, 5.0f, 0.f)));
+			RevoluteJoint paddleLeft(NULL, PxTransform(PxVec3(5.0f,2.0f,0.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+			RevoluteJoint paddleRight(NULL, PxTransform(PxVec3(-5.0f,2.0f,0.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f))), Paddle2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 
 			
 			//set collision filter flags
