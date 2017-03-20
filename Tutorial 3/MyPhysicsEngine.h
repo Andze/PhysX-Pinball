@@ -239,9 +239,10 @@ namespace PhysicsEngine
 			Paddle2->Name("Paddle2");
 			Add(Paddle2);
 
-			//RevoluteJoint paddleLeft(NULL, PxTransform(PxVec3(0.f,1.0f, 1.f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f))), Paddle1, PxTransform(PxVec3(0.f, 5.0f, 0.f)));
-			//RevoluteJoint paddleRight(NULL, PxTransform(PxVec3(0.f,-1.0f, 1.f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f))), Paddle2, PxTransform(PxVec3(0.f, -5.0f, 0.f)));
+			RevoluteJoint paddleLeft(NULL, PxTransform(PxVec3(-1.0f,1.0f,0.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f))), Paddle1, PxTransform(PxVec3(0.f, -5.0f, 0.f)));
+			RevoluteJoint paddleRight(NULL, PxTransform(PxVec3(1.0f,1.0f,0.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f))), Paddle2, PxTransform(PxVec3(0.f, 5.0f, 0.f)));
 
+			
 			//set collision filter flags
 			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
 			//use | operator to combine more actors e.g.
@@ -252,7 +253,7 @@ namespace PhysicsEngine
 			
 
 
-			ball = new Sphere(PxTransform(PxVec3(.0f, 13.5f, .0f)));
+			/*ball = new Sphere(PxTransform(PxVec3(.0f, 13.5f, .0f)));
 			ball->Color(color_palette[1]);
 			ball->Name("Ball");
 			Add(ball);
@@ -265,7 +266,7 @@ namespace PhysicsEngine
 			box2 = new Box(PxTransform(PxVec3(.0f, 12.5f, .0f)));
 			box2->Color(color_palette[1]);
 			box2->Name("Box2");
-			Add(box2);
+			Add(box2);*/
 			
 			//joint two boxes together
 			//the joint is fixed to the centre of the first box, oriented by 90 degrees around the Y axis
