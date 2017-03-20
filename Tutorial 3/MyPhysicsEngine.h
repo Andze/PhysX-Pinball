@@ -21,7 +21,7 @@ namespace PhysicsEngine
 	class Pyramid : public ConvexMesh
 	{
 	public:
-		Pyramid(PxTransform pose=PxTransform(PxIdentity), PxReal density=1.f) :
+		Pyramid(PxTransform pose=PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(.5f, .5f, .5f), PxReal density=1.f) :
 			ConvexMesh(vector<PxVec3>(begin(pyramid_verts),end(pyramid_verts)), pose, density)
 		{
 		}
@@ -40,8 +40,6 @@ namespace PhysicsEngine
 	{
 
 	};
-
-	
 
 	struct FilterGroup
 	{
@@ -243,8 +241,6 @@ namespace PhysicsEngine
 			paddleLeft = new RevoluteJoint(NULL, PxTransform(PxVec3(5.0f,3.0f,0.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 			paddleRight = new RevoluteJoint(NULL, PxTransform(PxVec3(-5.0f,3.0f,0.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f))), Paddle2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 
-			//paddleRight.DriveVelocity();
-
 			//set collision filter flags
 			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
 			//use | operator to combine more actors e.g.
@@ -252,12 +248,12 @@ namespace PhysicsEngine
 			//don't forget to set your flags for the matching actor as well, e.g.:
 			// box2->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
 
-			/*ball = new Sphere(PxTransform(PxVec3(.0f, 13.5f, .0f)));
+			ball = new Sphere(PxTransform(PxVec3(1.0f, 13.5f, .0f)));
 			ball->Color(color_palette[1]);
 			ball->Name("Ball");
 			Add(ball);
 		
-			box = new Box(PxTransform(PxVec3(.0f, .5f, .0f)));
+			/*box = new Box(PxTransform(PxVec3(.0f, .5f, .0f)));
 			box->Color(color_palette[0]);
 			box->Name("Box1");
 			Add(box);
@@ -280,23 +276,11 @@ namespace PhysicsEngine
 		}
 
 		/// An example use of key release handling
-		void PaddleL_Release()
-		{
-			paddleLeft->DriveVelocity(0);
-		}
-		void PaddleR_Release()
-		{
-			paddleRight->DriveVelocity(0);
-		}
+		void PaddleL_Release(){	paddleLeft->DriveVelocity(10);}
+		void PaddleR_Release(){	paddleRight->DriveVelocity(10);}
 
 		/// An example use of key presse handling
-		void PaddleL()
-		{
-			paddleLeft->DriveVelocity(-1);
-		}
-		void PaddleR()
-		{
-			paddleRight->DriveVelocity(-1);
-		}
+		void PaddleL(){	paddleLeft->DriveVelocity(-10);}
+		void PaddleR(){	paddleRight->DriveVelocity(-10);}
 	};
 }
