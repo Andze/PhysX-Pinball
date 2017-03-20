@@ -174,6 +174,8 @@ namespace PhysicsEngine
 			joint = PxRevoluteJointCreate(*GetPhysics(), px_actor0, localFrame0, (PxRigidActor*)actor1->Get(), localFrame1);
 			joint->setConstraintFlag(PxConstraintFlag::eVISUALIZATION,true);
 			DriveVelocity(20);
+			SetLimits(PxPi /4, (PxPi / 2 + PxPi / 8));
+			
 		}
 
 		void DriveVelocity(PxReal value)

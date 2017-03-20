@@ -174,8 +174,11 @@ namespace VisualDebugger
 		switch (toupper(key))
 		{
 		//implement your own
-		case 'R':
-			scene->ExampleKeyPressHandler();
+		case '.':
+			scene->PaddleL();
+			break;
+		case ',':
+			scene->PaddleR();
 			break;
 		default:
 			break;
@@ -187,8 +190,11 @@ namespace VisualDebugger
 		switch (toupper(key))
 		{
 		//implement your own
-		case 'R':
-			scene->ExampleKeyReleaseHandler();
+		case '.':
+			scene->PaddleL_Release();
+			break;
+		case ',':
+			scene->PaddleR_Release();
 			break;
 		default:
 			break;

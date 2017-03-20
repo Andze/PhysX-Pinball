@@ -193,6 +193,7 @@ namespace PhysicsEngine
 		Sphere* ball;
 		Pyramid* Paddle1, *Paddle2;
 		MySimulationEventCallback* my_callback;
+		RevoluteJoint* paddleLeft, *paddleRight;
 		
 	public:
 		//specify your custom filter shader here
@@ -239,19 +240,17 @@ namespace PhysicsEngine
 			Paddle2->Name("Paddle2");
 			Add(Paddle2);
 
-			RevoluteJoint paddleLeft(NULL, PxTransform(PxVec3(5.0f,2.0f,0.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
-			RevoluteJoint paddleRight(NULL, PxTransform(PxVec3(-5.0f,2.0f,0.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f))), Paddle2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+			paddleLeft = new RevoluteJoint(NULL, PxTransform(PxVec3(5.0f,3.0f,0.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+			paddleRight = new RevoluteJoint(NULL, PxTransform(PxVec3(-5.0f,3.0f,0.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f))), Paddle2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 
-			
+			//paddleRight.DriveVelocity();
+
 			//set collision filter flags
 			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
 			//use | operator to combine more actors e.g.
 			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2);
 			//don't forget to set your flags for the matching actor as well, e.g.:
 			// box2->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
-
-			
-
 
 			/*ball = new Sphere(PxTransform(PxVec3(.0f, 13.5f, .0f)));
 			ball->Color(color_palette[1]);
@@ -281,15 +280,23 @@ namespace PhysicsEngine
 		}
 
 		/// An example use of key release handling
-		void ExampleKeyReleaseHandler()
+		void PaddleL_Release()
 		{
-			cerr << "I am realeased!" << endl;
+			paddleLeft->DriveVelocity(0);
+		}
+		void PaddleR_Release()
+		{
+			paddleRight->DriveVelocity(0);
 		}
 
 		/// An example use of key presse handling
-		void ExampleKeyPressHandler()
+		void PaddleL()
 		{
-			cerr << "I am pressed!" << endl;
+			paddleLeft->DriveVelocity(-1);
+		}
+		void PaddleR()
+		{
+			paddleRight->DriveVelocity(-1);
 		}
 	};
 }
