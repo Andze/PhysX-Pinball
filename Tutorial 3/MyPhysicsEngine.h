@@ -12,8 +12,8 @@ namespace PhysicsEngine
 	static const PxVec3 color_palette[] = {PxVec3(46.f/255.f,9.f/255.f,39.f/255.f),PxVec3(217.f/255.f,0.f/255.f,0.f/255.f),
 		PxVec3(255.f/255.f,45.f/255.f,0.f/255.f),PxVec3(255.f/255.f,140.f/255.f,54.f/255.f),PxVec3(4.f/255.f,117.f/255.f,111.f/255.f)};
 
-	//pyramid vertices
-	static PxVec3 pyramid_verts[] = {PxVec3(0,1,0), PxVec3(1,0,0), PxVec3(-1,0,0), PxVec3(0,0,1), PxVec3(0,0,-1)};
+	//pyramid vertices						top			top					
+	static PxVec3 pyramid_verts[] = {PxVec3(0.5,4,0),PxVec3(-0.5,4,0), PxVec3(1,0,1), PxVec3(-1,0,1), PxVec3(-1,0,-1), PxVec3(1,0,-1)};
 	//pyramid triangles: a list of three vertices for each triangle e.g. the first triangle consists of vertices 1, 4 and 0
 	//vertices have to be specified in a counter-clockwise order to assure the correct shading in rendering
 	static PxU32 pyramid_trigs[] = {1, 4, 0, 3, 1, 0, 2, 3, 0, 4, 2, 0, 3, 2, 1, 2, 4, 1};
@@ -35,6 +35,13 @@ namespace PhysicsEngine
 		{
 		}
 	};
+
+	class CompoundObject: public StaticActor
+	{
+
+	};
+
+	
 
 	struct FilterGroup
 	{
@@ -184,6 +191,7 @@ namespace PhysicsEngine
 		Plane* plane;
 		Box* Board, * box, * box2;
 		Sphere* ball;
+		Pyramid* Paddle1, *Paddle2;
 		MySimulationEventCallback* my_callback;
 		
 	public:
@@ -221,6 +229,18 @@ namespace PhysicsEngine
 			//Board->GetShape(0)->setLocalPose(PxTransform(PxVec3(10.0f, 5.0f, 0.0f),PxQuat(PxHalfPi,PxVec3(0.0f, 0.0f, 0.0f))));
 			Add(Board);
 
+			Paddle1 = new Pyramid(PxTransform(PxVec3(0.0f, 5.0f, 5.0f)));
+			Paddle1->Color(color_palette[0]);
+			Paddle1->Name("Paddle1");
+			Add(Paddle1);
+
+			Paddle2 = new Pyramid(PxTransform(PxVec3(0.0f, 5.0f, 10.0f)));
+			Paddle2->Color(color_palette[0]);
+			Paddle2->Name("Paddle2");
+			Add(Paddle2);
+
+			//RevoluteJoint paddleLeft(NULL, PxTransform(PxVec3(0.f,1.0f, 1.f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f))), Paddle1, PxTransform(PxVec3(0.f, 5.0f, 0.f)));
+			//RevoluteJoint paddleRight(NULL, PxTransform(PxVec3(0.f,-1.0f, 1.f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f))), Paddle2, PxTransform(PxVec3(0.f, -5.0f, 0.f)));
 
 			//set collision filter flags
 			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
@@ -229,7 +249,15 @@ namespace PhysicsEngine
 			//don't forget to set your flags for the matching actor as well, e.g.:
 			// box2->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
 
-			box = new Box(PxTransform(PxVec3(.0f,.5f,.0f)));
+			
+
+
+			ball = new Sphere(PxTransform(PxVec3(.0f, 13.5f, .0f)));
+			ball->Color(color_palette[1]);
+			ball->Name("Ball");
+			Add(ball);
+		
+			box = new Box(PxTransform(PxVec3(.0f, .5f, .0f)));
 			box->Color(color_palette[0]);
 			box->Name("Box1");
 			Add(box);
@@ -238,19 +266,11 @@ namespace PhysicsEngine
 			box2->Color(color_palette[1]);
 			box2->Name("Box2");
 			Add(box2);
-
-
-			ball = new Sphere(PxTransform(PxVec3(.0f, 13.5f, .0f)));
-			ball->Color(color_palette[1]);
-			ball->Name("Ball");
-			Add(ball);
-		
-
 			
 			//joint two boxes together
 			//the joint is fixed to the centre of the first box, oriented by 90 degrees around the Y axis
 			//and has the second object attached 5 meters away along the Y axis from the first object.
-			RevoluteJoint joint(box, PxTransform(PxVec3(0.f,0.f,0.f), PxQuat(PxPi/2,PxVec3(0.f,1.f,0.f))), box2, PxTransform(PxVec3(0.f,5.f,0.f)));
+			//RevoluteJoint joint(box, PxTransform(PxVec3(0.f,0.f,0.f), PxQuat(PxPi/2,PxVec3(0.f,1.f,0.f))), box2, PxTransform(PxVec3(0.f,5.f,0.f)));
 			
 		}
 
