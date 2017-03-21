@@ -123,6 +123,8 @@ namespace PhysicsEngine
 		}
 	};
 
+	
+
 	//Distance joint with the springs switched on
 	class DistanceJoint : public Joint
 	{

@@ -36,9 +36,17 @@ namespace PhysicsEngine
 		}
 	};
 
-	class CompoundObject: public StaticActor
+	class CompoundObject : public StaticActor
 	{
-
+	public:
+		CompoundObject(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(10.0f, .1f, 1.0f), PxReal density = 1.f) : StaticActor(pose)
+		{
+			//				X,Y,Z,D
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y, dimensions.z), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y, dimensions.z), density);
+			CreateShape(PxBoxGeometry(dimensions.x, dimensions.y, dimensions.z), density);
+			CreateShape(PxBoxGeometry(dimensions.x, dimensions.y, dimensions.z), density);
+		}
 	};
 
 	struct FilterGroup
@@ -187,7 +195,8 @@ namespace PhysicsEngine
 	class MyScene : public Scene
 	{
 		Plane* plane;
-		Box* Board, * box, * box2;
+		Box* box, * box2;
+		CompoundObject* Board;
 		Sphere* ball;
 		Pyramid* Paddle1, *Paddle2;
 		MySimulationEventCallback* my_callback;
@@ -222,11 +231,16 @@ namespace PhysicsEngine
 			plane->Color(PxVec3(210.f/255.f,210.f/255.f,210.f/255.f));
 			Add(plane);
 
-			Board = new Box(PxTransform(PxVec3(10.0f, 0.5f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))),PxVec3(1.0f,10.0f,1.0f));
+			Board = new CompoundObject(PxTransform(PxVec3(20.0f, 0.5f, 0.0f)),PxVec3(1.0f,10.0f,1.0f));
 			Board->Color(color_palette[0]);
 			Board->Name("Board");
-			//Board->GetShape(0)->setLocalPose(PxTransform(PxVec3(10.0f, 5.0f, 0.0f),PxQuat(PxHalfPi,PxVec3(0.0f, 0.0f, 0.0f))));
-			//Add(Board);
+			Board->GetShape(0)->setLocalPose(PxTransform(PxVec3(20.0f, 20.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			Board->GetShape(1)->setLocalPose(PxTransform(PxVec3(-20.0f, 20.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			Board->GetShape(2)->setLocalPose(PxTransform(PxVec3(0.0f, 20.0f, 20.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))));
+			Board->GetShape(3)->setLocalPose(PxTransform(PxVec3(0.0f, 20.0f, -20.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))));
+			Add(Board);
+
+			
 
 			Paddle1 = new Pyramid(PxTransform(PxVec3(0.0f, 5.0f, 5.0f)));
 			Paddle1->Color(color_palette[0]);
