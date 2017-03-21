@@ -39,13 +39,13 @@ namespace PhysicsEngine
 	class CompoundObject : public StaticActor
 	{
 	public:
-		CompoundObject(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(10.0f, .1f, 1.0f), PxReal density = 1.f) : StaticActor(pose)
+		CompoundObject(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(10.0f, 0.1f, 1.0f), PxReal density = 1.f) : StaticActor(pose)
 		{
 			//				X,Y,Z,D
-			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y, dimensions.z), density);
-			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y, dimensions.z), density);
-			CreateShape(PxBoxGeometry(dimensions.x, dimensions.y, dimensions.z), density);
-			CreateShape(PxBoxGeometry(dimensions.x, dimensions.y, dimensions.z), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y * 4, dimensions.z), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y * 4, dimensions.z), density);
+			CreateShape(PxBoxGeometry(dimensions.x, dimensions.y*2, dimensions.z/2), density);
+			CreateShape(PxBoxGeometry(dimensions.x , dimensions.y*2, dimensions.z/2), density);
 		}
 	};
 
@@ -236,8 +236,8 @@ namespace PhysicsEngine
 			Board->Name("Board");
 			Board->GetShape(0)->setLocalPose(PxTransform(PxVec3(20.0f, 20.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(1)->setLocalPose(PxTransform(PxVec3(-20.0f, 20.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
-			Board->GetShape(2)->setLocalPose(PxTransform(PxVec3(0.0f, 20.0f, 20.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))));
-			Board->GetShape(3)->setLocalPose(PxTransform(PxVec3(0.0f, 20.0f, -20.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))));
+			Board->GetShape(2)->setLocalPose(PxTransform(PxVec3(0.0f, 20.0f, 40.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))));
+			Board->GetShape(3)->setLocalPose(PxTransform(PxVec3(0.0f, 20.0f, -40.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))));
 			Add(Board);
 
 			
