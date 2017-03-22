@@ -242,7 +242,8 @@ namespace PhysicsEngine
 			Board->GetShape(3)->setLocalPose(PxTransform(PxVec3(0.0f, 20.0f, -40.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))));
 			Board->GetShape(4)->setLocalPose(PxTransform(PxVec3(0.0f, 18.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(5)->setLocalPose(PxTransform(PxVec3(0.0f, 23.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
-			Board->Color(color_palette[4], 5);
+			Board->GetShape(5)->setFlag(PxShapeFlag::eVISUALIZATION, false);
+			Board->Color(PxVec3(0.0f, 0.0f, 0.0f), 5);
 			Add(Board);
 
 			
