@@ -180,6 +180,9 @@ namespace VisualDebugger
 		case ',':
 			scene->PaddleR();
 			break;
+		case ' ':
+			scene->Plunge();
+			break;
 		default:
 			break;
 		}
@@ -195,6 +198,9 @@ namespace VisualDebugger
 			break;
 		case ',':
 			scene->PaddleR_Release();
+			break;
+		case ' ':
+			scene->Plunge_Release();
 			break;
 		default:
 			break;

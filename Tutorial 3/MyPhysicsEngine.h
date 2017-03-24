@@ -66,14 +66,16 @@ namespace PhysicsEngine
 	class Trampoline
 	{
 		vector<DistanceJoint*> springs;
-		Box *bottom, *top;
+		Box *top;
+		BoxStatic *bottom;
 
 	public:
-		Trampoline(const PxVec3& dimensions=PxVec3(1.f,1.f,1.f), PxReal stiffness=1.f, PxReal damping=1.f)
+		Trampoline(const PxTransform& pose = PxTransform(PxIdentity),const PxVec3& dimensions=PxVec3(1.f,1.f,1.f), PxReal stiffness=1.f, PxReal damping=1.f)
 		{
 			PxReal thickness = .1f;
-			bottom = new Box(PxTransform(PxVec3(0.f,thickness,0.f)),PxVec3(dimensions.x,thickness,dimensions.z));
-			top = new Box(PxTransform(PxVec3(0.f,dimensions.y+thickness,0.f)),PxVec3(dimensions.x,thickness,dimensions.z));
+			bottom = new BoxStatic(PxTransform(pose.p + PxVec3(.0f,.0f,.0f), pose.q),PxVec3(dimensions.x,thickness,dimensions.z));
+			top = new Box(PxTransform(pose.p + PxVec3(.0f, .0f, .0f), pose.q), PxVec3(dimensions.x, thickness, dimensions.z));
+
 			springs.resize(4);
 			springs[0] = new DistanceJoint(bottom, PxTransform(PxVec3(dimensions.x,thickness,dimensions.z)), top, PxTransform(PxVec3(dimensions.x,-dimensions.y,dimensions.z)));
 			springs[1] = new DistanceJoint(bottom, PxTransform(PxVec3(dimensions.x,thickness,-dimensions.z)), top, PxTransform(PxVec3(dimensions.x,-dimensions.y,-dimensions.z)));
@@ -85,6 +87,11 @@ namespace PhysicsEngine
 				springs[i]->Stiffness(stiffness);
 				springs[i]->Damping(damping);
 			}
+		} 
+
+		void Plunge(PxReal force)
+		{
+			top->Get()->isRigidDynamic()->addForce(PxVec3(0.f,force * 100 ,0.f));
 		}
 
 		void AddToScene(Scene* scene)
@@ -265,7 +272,8 @@ namespace PhysicsEngine
 			paddleLeft = new RevoluteJoint(NULL, PxTransform(PxVec3(7.5f,15.0f,30.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi /2, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 			paddleRight = new RevoluteJoint(NULL, PxTransform(PxVec3(-7.5f,15.0f,30.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi /2, PxVec3(0.0f, 0.f, -1.f))), Paddle2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 
-			trampoline = new Trampoline(PxVec3(.5f, 15.0f, .5f),1.0f , 1.0f);
+			trampoline = new Trampoline(PxTransform(PxVec3(0.0f, 5.0f, 0.0f)),PxVec3(.5f, 1.0f, .5f),200.0f , 50.0f);
+			trampoline->AddToScene(this);
 			
 
 			//set collision filter flags
@@ -273,10 +281,7 @@ namespace PhysicsEngine
 			//use | operator to combine more actors e.g.
 			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2);
 			//don't forget to set your flags for the matching actor as well, e.g.
-	
 			// box2->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
-
-		
 		
 			/*box = new Box(PxTransform(PxVec3(.0f, .5f, .0f)));
 			box->Color(color_palette[0]);
@@ -298,6 +303,13 @@ namespace PhysicsEngine
 		//Custom udpate function
 		virtual void CustomUpdate() 
 		{
+		}
+
+		void Plunge() {			
+			trampoline->Plunge(5.0f);
+		}
+		void Plunge_Release() { 
+			trampoline->Plunge(0.0f);
 		}
 
 		/// An example use of key release handling
