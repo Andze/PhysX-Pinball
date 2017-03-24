@@ -233,21 +233,20 @@ namespace PhysicsEngine
 			plane->Color(PxVec3(210.f/255.f,210.f/255.f,210.f/255.f));
 			Add(plane);
 
-			Board = new CompoundObject(PxTransform(PxVec3(20.0f, 0.5f, 0.0f)),PxVec3(1.0f,10.0f,1.0f));
+			Board = new CompoundObject(PxTransform(PxVec3(0.0f, 0.5f, 0.0f), PxQuat(PxHalfPi / 4, PxVec3(1.0f, 0.f, 0.f))),PxVec3(1.0f,10.0f,1.0f));
 			Board->Color(color_palette[0]);
 			Board->Name("Board");
-			Board->GetShape(0)->setLocalPose(PxTransform(PxVec3(20.0f, 20.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
-			Board->GetShape(1)->setLocalPose(PxTransform(PxVec3(-20.0f, 20.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
-			Board->GetShape(2)->setLocalPose(PxTransform(PxVec3(0.0f, 20.0f, 40.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))));
-			Board->GetShape(3)->setLocalPose(PxTransform(PxVec3(0.0f, 20.0f, -40.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))));
-			Board->GetShape(4)->setLocalPose(PxTransform(PxVec3(0.0f, 18.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
-			Board->GetShape(5)->setLocalPose(PxTransform(PxVec3(0.0f, 23.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			Board->GetShape(0)->setLocalPose(PxTransform(PxVec3(20.0f, 25.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			Board->GetShape(1)->setLocalPose(PxTransform(PxVec3(-20.0f, 25.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			Board->GetShape(2)->setLocalPose(PxTransform(PxVec3(0.0f, 25.0f, 40.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))));
+			Board->GetShape(3)->setLocalPose(PxTransform(PxVec3(0.0f, 25.0f, -40.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))));
+			Board->GetShape(4)->setLocalPose(PxTransform(PxVec3(0.0f, 23.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			Board->GetShape(5)->setLocalPose(PxTransform(PxVec3(0.0f, 27.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(5)->setFlag(PxShapeFlag::eVISUALIZATION, false);
 			Board->Color(PxVec3(0.0f, 0.0f, 0.0f), 5);
 			Add(Board);
 
 			
-
 			Paddle1 = new Pyramid(PxTransform(PxVec3(0.0f, 5.0f, 5.0f)));
 			Paddle1->Color(color_palette[0]);
 			Paddle1->Name("Paddle1");
@@ -258,8 +257,8 @@ namespace PhysicsEngine
 			Paddle2->Name("Paddle2");
 			Add(Paddle2);
 
-			paddleLeft = new RevoluteJoint(NULL, PxTransform(PxVec3(5.0f,3.0f,0.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
-			paddleRight = new RevoluteJoint(NULL, PxTransform(PxVec3(-5.0f,3.0f,0.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f))), Paddle2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+			paddleLeft = new RevoluteJoint(NULL, PxTransform(PxVec3(5.0f,20.0f,20.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi /2, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+			paddleRight = new RevoluteJoint(NULL, PxTransform(PxVec3(-5.0f,20.0f,20.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi /2, PxVec3(0.0f, 0.f, -1.f))), Paddle2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 
 			//set collision filter flags
 			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
