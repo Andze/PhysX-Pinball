@@ -10,10 +10,10 @@ namespace PhysicsEngine
 
 	//a list of colours: Circus Palette
 	static const PxVec3 color_palette[] = {PxVec3(46.f/255.f,9.f/255.f,39.f/255.f),PxVec3(217.f/255.f,0.f/255.f,0.f/255.f),
-		PxVec3(255.f/255.f,45.f/255.f,0.f/255.f),PxVec3(255.f/255.f,140.f/255.f,54.f/255.f),PxVec3(4.f/255.f,117.f/255.f,111.f/255.f)};
+		PxVec3(255.f/255.f,45.f/255.f,0.f/255.f),PxVec3(255.f/255.f,140.f/255.f,54.f/255.f),PxVec3(4.f/255.f,117.f/255.f,111.f/255.f),PxVec3(0.f / 255.f,0.f / 255.f,200.f / 255.f) };
 
 	//pyramid vertices						top			top					
-	static PxVec3 pyramid_verts[] = {PxVec3(0.5,4,0),PxVec3(-0.5,4,0), PxVec3(1,0,1), PxVec3(-1,0,1), PxVec3(-1,0,-1), PxVec3(1,0,-1)};
+	static PxVec3 pyramid_verts[] = {PxVec3(0.5,5,0.25),PxVec3(-0.5,5,0.25),PxVec3(0.5,5,0.-0.1),PxVec3(-0.5,5,0.-0.1), PxVec3(1,0,1), PxVec3(-1,0,1), PxVec3(-1,0,-1), PxVec3(1,0,-1)};
 	//pyramid triangles: a list of three vertices for each triangle e.g. the first triangle consists of vertices 1, 4 and 0
 	//vertices have to be specified in a counter-clockwise order to assure the correct shading in rendering
 	static PxU32 pyramid_trigs[] = {1, 4, 0, 3, 1, 0, 2, 3, 0, 4, 2, 0, 3, 2, 1, 2, 4, 1};
@@ -203,6 +203,7 @@ namespace PhysicsEngine
 		Pyramid* Paddle1, *Paddle2;
 		MySimulationEventCallback* my_callback;
 		RevoluteJoint* paddleLeft, *paddleRight;
+		Trampoline* trampoline;
 		
 	public:
 		//specify your custom filter shader here
@@ -234,8 +235,8 @@ namespace PhysicsEngine
 			Add(plane);
 
 			Board = new CompoundObject(PxTransform(PxVec3(0.0f, 0.5f, 0.0f), PxQuat(PxHalfPi / 4, PxVec3(1.0f, 0.f, 0.f))),PxVec3(1.0f,10.0f,1.0f));
-			Board->Color(color_palette[0]);
-			Board->Name("Board");
+			Board->Color(color_palette[5]);
+			Board->Name("GameBoard");
 			Board->GetShape(0)->setLocalPose(PxTransform(PxVec3(20.0f, 25.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(1)->setLocalPose(PxTransform(PxVec3(-20.0f, 25.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(2)->setLocalPose(PxTransform(PxVec3(0.0f, 25.0f, 40.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))));
@@ -246,7 +247,11 @@ namespace PhysicsEngine
 			Board->Color(PxVec3(0.0f, 0.0f, 0.0f), 5);
 			Add(Board);
 
-			
+			ball = new Sphere(PxTransform(PxVec3(0.0f, 17.0f, 30.0f)));
+			ball->Color(color_palette[1]);
+			ball->Name("Ball");
+			Add(ball);
+
 			Paddle1 = new Pyramid(PxTransform(PxVec3(0.0f, 5.0f, 5.0f)));
 			Paddle1->Color(color_palette[0]);
 			Paddle1->Name("Paddle1");
@@ -257,20 +262,21 @@ namespace PhysicsEngine
 			Paddle2->Name("Paddle2");
 			Add(Paddle2);
 
-			paddleLeft = new RevoluteJoint(NULL, PxTransform(PxVec3(5.0f,20.0f,20.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi /2, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
-			paddleRight = new RevoluteJoint(NULL, PxTransform(PxVec3(-5.0f,20.0f,20.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi /2, PxVec3(0.0f, 0.f, -1.f))), Paddle2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+			paddleLeft = new RevoluteJoint(NULL, PxTransform(PxVec3(7.5f,15.0f,30.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi /2, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+			paddleRight = new RevoluteJoint(NULL, PxTransform(PxVec3(-7.5f,15.0f,30.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi /2, PxVec3(0.0f, 0.f, -1.f))), Paddle2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+
+			trampoline = new Trampoline(PxVec3(.5f, 15.0f, .5f),1.0f , 1.0f);
+			
 
 			//set collision filter flags
 			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
 			//use | operator to combine more actors e.g.
 			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2);
-			//don't forget to set your flags for the matching actor as well, e.g.:
+			//don't forget to set your flags for the matching actor as well, e.g.
+	
 			// box2->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
 
-			ball = new Sphere(PxTransform(PxVec3(1.0f, 13.5f, .0f)));
-			ball->Color(color_palette[1]);
-			ball->Name("Ball");
-			Add(ball);
+		
 		
 			/*box = new Box(PxTransform(PxVec3(.0f, .5f, .0f)));
 			box->Color(color_palette[0]);
