@@ -82,11 +82,6 @@ namespace PhysicsEngine
 			springs[2] = new DistanceJoint(bottom, PxTransform(PxVec3(-dimensions.x,thickness,dimensions.z)), top, PxTransform(PxVec3(-dimensions.x,-dimensions.y,dimensions.z)));
 			springs[3] = new DistanceJoint(bottom, PxTransform(PxVec3(-dimensions.x,thickness,-dimensions.z)), top, PxTransform(PxVec3(-dimensions.x,-dimensions.y,-dimensions.z)));
 
-			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y * 4, dimensions.z * 3), density);
-			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y * 4, dimensions.z * 3), density);
-			CreateShape(PxBoxGeometry(dimensions.x * 3, dimensions.y * 2, dimensions.z / 2), density);
-			CreateShape(PxBoxGeometry(dimensions.x * 3, dimensions.y * 2, dimensions.z / 2), density);
-
 			for (unsigned int i = 0; i < springs.size(); i++)
 			{
 				springs[i]->Stiffness(stiffness);
@@ -96,9 +91,8 @@ namespace PhysicsEngine
 
 		void Plunge(PxReal force)
 		{
-			top->Get()->isRigidDynamic()->addForce(PxVec3(0.f,force * 100 ,0.f));
+			top->Get()->isRigidDynamic()->addForce(PxVec3(0.f, (force * 100)/2, -force * 100.f));
 		}
-
 		void AddToScene(Scene* scene)
 		{
 			scene->Add(bottom);
@@ -263,7 +257,7 @@ namespace PhysicsEngine
 			ball->Color(color_palette[1]);
 			ball->Name("Ball");
 			Add(ball);
-
+			
 			Paddle1 = new Pyramid(PxTransform(PxVec3(0.0f, 5.0f, 5.0f)));
 			Paddle1->Color(color_palette[0]);
 			Paddle1->Name("Paddle1");
@@ -277,7 +271,7 @@ namespace PhysicsEngine
 			paddleLeft = new RevoluteJoint(NULL, PxTransform(PxVec3(7.5f,15.0f,30.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi /2, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 			paddleRight = new RevoluteJoint(NULL, PxTransform(PxVec3(-7.5f,15.0f,30.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi /2, PxVec3(0.0f, 0.f, -1.f))), Paddle2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 
-			trampoline = new Trampoline(PxTransform(PxVec3(0.0f, 5.0f, 0.0f)),PxVec3(.5f, 2.0f, .5f),100.0f , 50.0f);
+			trampoline = new Trampoline(PxTransform(PxVec3(18.0f, 15.0f, 30.0f),PxQuat(PxPi, PxVec3(.0f, .0f, 1.0f))* PxQuat(PxHalfPi + PxHalfPi /4, PxVec3(-1.0f, 0.0f, 0.0f))),PxVec3(1.0f, 4.0f, 1.0f),100.0f , 25.0f);
 			trampoline->AddToScene(this);
 			
 
@@ -311,7 +305,7 @@ namespace PhysicsEngine
 		}
 
 		void Plunge() {			
-			trampoline->Plunge(5.0f);
+			trampoline->Plunge(25.0f);
 		}
 		void Plunge_Release() { 
 			trampoline->Plunge(0.0f);
