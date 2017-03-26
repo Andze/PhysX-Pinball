@@ -253,7 +253,7 @@ namespace PhysicsEngine
 			Board->Color(PxVec3(0.0f, 0.0f, 0.0f), 5);
 			Add(Board);
 
-			ball = new Sphere(PxTransform(PxVec3(0.0f, 17.0f, 30.0f)));
+			ball = new Sphere(PxTransform(PxVec3(18.0f, 17.0f, 25.0f)));
 			ball->Color(color_palette[1]);
 			ball->Name("Ball");
 			Add(ball);
