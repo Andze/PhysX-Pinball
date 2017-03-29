@@ -13,7 +13,7 @@ namespace PhysicsEngine
 		PxVec3(255.f/255.f,45.f/255.f,0.f/255.f),PxVec3(255.f/255.f,140.f/255.f,54.f/255.f),PxVec3(4.f/255.f,117.f/255.f,111.f/255.f),PxVec3(0.f / 255.f,0.f / 255.f,200.f / 255.f) };
 
 	//pyramid vertices						top			top					
-	static PxVec3 pyramid_verts[] = {PxVec3(0.5,5,0.25),PxVec3(-0.5,5,0.25),PxVec3(0.5,5,0.-0.25),PxVec3(-0.5,5,0.-0.25), PxVec3(1,0,1), PxVec3(-1,0,1), PxVec3(-1,0,-1), PxVec3(1,0,-1)};
+	static PxVec3 pyramid_verts[] = {PxVec3(0.5,4,0.25),PxVec3(-0.5,4,0.25),PxVec3(0.5,4,0.-0.25),PxVec3(-0.5,4,0.-0.25), PxVec3(1,0,0.5), PxVec3(-1,0,0.5), PxVec3(-1,0,-0.5), PxVec3(1,0,-0.5)};
 	//pyramid triangles: a list of three vertices for each triangle e.g. the first triangle consists of vertices 1, 4 and 0
 	//vertices have to be specified in a counter-clockwise order to assure the correct shading in rendering
 	static PxU32 pyramid_trigs[] = {1, 4, 0, 3, 1, 0, 2, 3, 0, 4, 2, 0, 3, 2, 1, 2, 4, 1};
@@ -65,6 +65,10 @@ namespace PhysicsEngine
 			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y/2 + dimensions.y/6, dimensions.z * 3), density);
 			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 + dimensions.y / 6, dimensions.z * 3), density);
 			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 + dimensions.y/4, dimensions.z * 3), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 + dimensions.y / 4, dimensions.z * 3), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 + dimensions.y / 4, dimensions.z * 3), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 - dimensions.y /8 , dimensions.z * 3), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 , dimensions.z * 3), density);
 		}
 	};
 
@@ -277,7 +281,14 @@ namespace PhysicsEngine
 			Board->GetShape(8)->setLocalPose(PxTransform(PxVec3(-10.0f, 25.0f, 30.0f), PxQuat(PxHalfPi / 2 + PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			//pocket
 			Board->GetShape(9)->setLocalPose(PxTransform(PxVec3(-16.0f, 25.0f, 33.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
-			Board->Color(PxVec3(0.0f, 0.0f, 0.0f), 5);
+			//Top Corners
+			Board->GetShape(10)->setLocalPose(PxTransform(PxVec3(13.5f, 25.0f, -35.0f), PxQuat(PxHalfPi / 2 + PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			Board->GetShape(11)->setLocalPose(PxTransform(PxVec3(-13.5f, 25.0f, -35.0f), PxQuat(-PxHalfPi / 2 - PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			//Paddle walls
+			Board->GetShape(12)->setLocalPose(PxTransform(PxVec3(9.0f, 25.0f, 25.25f), PxQuat(-PxHalfPi / 2 - PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			Board->GetShape(13)->setLocalPose(PxTransform(PxVec3(-10.0f, 25.0f, 24.25f), PxQuat(PxHalfPi / 2 + PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+
+			Board->Color(PxVec3(0.0f, 0.0f, 0.0f), 4);
 			Add(Board);
 
 			ball = new Sphere(PxTransform(PxVec3(18.0f, 18.0f, 23.0f)));
@@ -295,8 +306,8 @@ namespace PhysicsEngine
 			Paddle2->Name("Paddle2");
 			Add(Paddle2);
 
-			paddleLeft = new RevoluteJoint(NULL, PxTransform(PxVec3(7.5f,15.0f,30.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
-			paddleRight = new RevoluteJoint(NULL, PxTransform(PxVec3(-7.5f,15.0f,30.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))), Paddle2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+			paddleLeft = new RevoluteJoint(NULL, PxTransform(PxVec3(5.5f,13.5f,35.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+			paddleRight = new RevoluteJoint(NULL, PxTransform(PxVec3(-5.5f,13.5f,35.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))), Paddle2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 
 			Flap = new LID(PxTransform(PxVec3(0.0f, 5.0f, 10.0f)));
 			Flap->Color(color_palette[5]);
