@@ -69,6 +69,7 @@ namespace PhysicsEngine
 			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 + dimensions.y / 4, dimensions.z * 3), density);
 			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 - dimensions.y /8 , dimensions.z * 3), density);
 			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 , dimensions.z * 3), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 - dimensions.y / 8, dimensions.z * 3), density);
 		}
 	};
 
@@ -219,12 +220,12 @@ namespace PhysicsEngine
 
 		return PxFilterFlags();
 	};
-
 	///Custom scene class
 	class MyScene : public Scene
 	{
 		Plane* plane;
 		Box* box, * box2;
+		BoxStatic *Trigger;
 		LID *Flap;
 		CompoundObject* Board;
 		Sphere* ball;
@@ -259,7 +260,7 @@ namespace PhysicsEngine
 			///Initialise and set the customised event callback
 			my_callback = new MySimulationEventCallback();
 			px_scene->setSimulationEventCallback(my_callback);
-
+			
 			plane = new Plane();
 			plane->Color(PxVec3(210.f/255.f,210.f/255.f,210.f/255.f));
 			Add(plane);
@@ -286,6 +287,7 @@ namespace PhysicsEngine
 			Board->GetShape(11)->setLocalPose(PxTransform(PxVec3(-13.5f, 25.0f, -35.0f), PxQuat(-PxHalfPi / 2 - PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			//Paddle walls
 			Board->GetShape(12)->setLocalPose(PxTransform(PxVec3(9.0f, 25.0f, 25.25f), PxQuat(-PxHalfPi / 2 - PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			Board->GetShape(14)->setLocalPose(PxTransform(PxVec3(12.0f, 25.0f, 19.25f), PxQuat(PxPi, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(13)->setLocalPose(PxTransform(PxVec3(-10.0f, 25.0f, 24.25f), PxQuat(PxHalfPi / 2 + PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 
 			Board->Color(PxVec3(0.0f, 0.0f, 0.0f), 4);
@@ -334,11 +336,13 @@ namespace PhysicsEngine
 			//don't forget to set your flags for the matching actor as well, e.g.
 			// box2->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
 		
-			/*box = new Box(PxTransform(PxVec3(.0f, .5f, .0f)));
-			box->Color(color_palette[0]);
-			box->Name("Box1");
-			Add(box);
+			Trigger = new BoxStatic(PxTransform(PxVec3(0.0f, 9.0f, 45.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))),PxVec3(2.0f,2.0f,12.0f));
+			Trigger->Name("Trigger");
+			Add(Trigger);
+			Trigger->SetTrigger(true);
+			Trigger->GetShape(0)->setFlag(PxShapeFlag::eVISUALIZATION, false);
 
+			/*
 			box2 = new Box(PxTransform(PxVec3(.0f, 12.5f, .0f)));
 			box2->Color(color_palette[1]);
 			box2->Name("Box2");
@@ -354,6 +358,19 @@ namespace PhysicsEngine
 		//Custom udpate function
 		virtual void CustomUpdate() 
 		{
+			if (my_callback->trigger == true)
+			{
+				std::cout<<"Dead"<< endl;
+				resetBall();
+			}
+		}
+
+		void resetBall()
+		{
+			px_scene->removeActor(*((PxActor*)ball->Get()));
+			((PxActor*)ball->Get())->release();
+			ball = new Sphere(PxTransform(PxVec3(18.0f, 18.0f, 23.0f)));
+			Add(ball);
 		}
 
 		void Plunge() {			
