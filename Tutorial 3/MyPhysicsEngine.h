@@ -62,7 +62,9 @@ namespace PhysicsEngine
 			CreateShape(PxBoxGeometry(dimensions.x * (dimensions.y * 2), dimensions.y * 4, dimensions.z/4), density);
 			CreateShape(PxBoxGeometry(dimensions.x * (dimensions.y * 2), dimensions.y * 4, dimensions.z/4), density);
 			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y * 3, dimensions.z * 3), density);
-
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y/2 + dimensions.y/6, dimensions.z * 3), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 + dimensions.y / 6, dimensions.z * 3), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y , dimensions.z * 3), density);
 		}
 	};
 
@@ -225,7 +227,7 @@ namespace PhysicsEngine
 		Pyramid* Paddle1, *Paddle2;
 		MySimulationEventCallback* my_callback;
 		RevoluteJoint* paddleLeft, *paddleRight, *FlapThing;
-		Trampoline* trampoline;
+		Trampoline* trampoline, *trampoline2;
 		
 	public:
 		//specify your custom filter shader here
@@ -268,7 +270,13 @@ namespace PhysicsEngine
 			Board->GetShape(4)->setLocalPose(PxTransform(PxVec3(0.0f, 23.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(5)->setLocalPose(PxTransform(PxVec3(0.0f, 27.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(5)->setFlag(PxShapeFlag::eVISUALIZATION, false);
+			//Plunger wall
 			Board->GetShape(6)->setLocalPose(PxTransform(PxVec3(16.0f, 25.0f, 10.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			//bottom walls
+			Board->GetShape(7)->setLocalPose(PxTransform(PxVec3(10.0f, 25.0f, 30.0f), PxQuat(-PxHalfPi/2 - PxHalfPi/8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			Board->GetShape(8)->setLocalPose(PxTransform(PxVec3(-10.0f, 25.0f, 30.0f), PxQuat(PxHalfPi / 2 + PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			//pocket
+			Board->GetShape(9)->setLocalPose(PxTransform(PxVec3(-16.0f, 25.0f, 30.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->Color(PxVec3(0.0f, 0.0f, 0.0f), 5);
 			Add(Board);
 
@@ -303,6 +311,9 @@ namespace PhysicsEngine
 
 			trampoline = new Trampoline(PxTransform(PxVec3(18.0f, 15.0f, 30.0f),PxQuat(PxPi, PxVec3(.0f, .0f, 1.0f))* PxQuat(PxHalfPi + PxHalfPi /4, PxVec3(-1.0f, 0.0f, 0.0f))),PxVec3(1.0f, 4.0f, 1.0f),100.0f , 25.0f);
 			trampoline->AddToScene(this);
+
+			trampoline2 = new Trampoline(PxTransform(PxVec3(-18.0f, 13.0f, 37.5f), PxQuat(PxPi, PxVec3(.0f, .0f, 1.0f))* PxQuat(PxHalfPi + PxHalfPi / 4, PxVec3(-1.0f, 0.0f, 0.0f))), PxVec3(1.0f, 4.0f, 1.0f), 100.0f, 25.0f);
+			trampoline2->AddToScene(this);
 			
 
 			//set collision filter flags
@@ -335,18 +346,17 @@ namespace PhysicsEngine
 		}
 
 		void Plunge() {			
-			trampoline->Plunge(25.0f);
+			trampoline->Plunge(30.0f);
 			FlapThing->DriveVelocity(-10);
 		}
-		void Plunge_Release() { 
-			trampoline->Plunge(0.0f);
-		}
+		void Plunge_Release() {trampoline->Plunge(0.0f);}
 
-		/// An example use of key release handling
+		void Tilt_Release() {trampoline2->Plunge(9.0f);}
+		void Tilt() {trampoline2->Plunge(15.0f);}
+
 		void PaddleL_Release(){	paddleLeft->DriveVelocity(10);}
 		void PaddleR_Release(){	paddleRight->DriveVelocity(10);}
 
-		/// An example use of key presse handling
 		void PaddleL(){	paddleLeft->DriveVelocity(-10); FlapThing->DriveVelocity(10);}
 		void PaddleR(){	paddleRight->DriveVelocity(-10);}
 	};

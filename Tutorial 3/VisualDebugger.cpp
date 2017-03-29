@@ -183,6 +183,9 @@ namespace VisualDebugger
 		case ' ':
 			scene->Plunge();
 			break;
+		case '/':
+			scene->Tilt();
+			break;
 		default:
 			break;
 		}
@@ -202,6 +205,8 @@ namespace VisualDebugger
 		case ' ':
 			scene->Plunge_Release();
 			break;
+		case '/':
+			scene->Tilt_Release();
 		default:
 			break;
 		}
