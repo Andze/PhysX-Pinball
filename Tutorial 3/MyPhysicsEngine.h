@@ -64,7 +64,7 @@ namespace PhysicsEngine
 			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y * 3, dimensions.z * 3), density);
 			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y/2 + dimensions.y/6, dimensions.z * 3), density);
 			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 + dimensions.y / 6, dimensions.z * 3), density);
-			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y , dimensions.z * 3), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 + dimensions.y/4, dimensions.z * 3), density);
 		}
 	};
 
@@ -276,7 +276,7 @@ namespace PhysicsEngine
 			Board->GetShape(7)->setLocalPose(PxTransform(PxVec3(10.0f, 25.0f, 30.0f), PxQuat(-PxHalfPi/2 - PxHalfPi/8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(8)->setLocalPose(PxTransform(PxVec3(-10.0f, 25.0f, 30.0f), PxQuat(PxHalfPi / 2 + PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			//pocket
-			Board->GetShape(9)->setLocalPose(PxTransform(PxVec3(-16.0f, 25.0f, 30.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			Board->GetShape(9)->setLocalPose(PxTransform(PxVec3(-16.0f, 25.0f, 33.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->Color(PxVec3(0.0f, 0.0f, 0.0f), 5);
 			Add(Board);
 
@@ -312,7 +312,7 @@ namespace PhysicsEngine
 			trampoline = new Trampoline(PxTransform(PxVec3(18.0f, 15.0f, 30.0f),PxQuat(PxPi, PxVec3(.0f, .0f, 1.0f))* PxQuat(PxHalfPi + PxHalfPi /4, PxVec3(-1.0f, 0.0f, 0.0f))),PxVec3(1.0f, 4.0f, 1.0f),100.0f , 25.0f);
 			trampoline->AddToScene(this);
 
-			trampoline2 = new Trampoline(PxTransform(PxVec3(-18.0f, 13.0f, 37.5f), PxQuat(PxPi, PxVec3(.0f, .0f, 1.0f))* PxQuat(PxHalfPi + PxHalfPi / 4, PxVec3(-1.0f, 0.0f, 0.0f))), PxVec3(1.0f, 4.0f, 1.0f), 100.0f, 25.0f);
+			trampoline2 = new Trampoline(PxTransform(PxVec3(-18.0f, 12.0f, 39.5f), PxQuat(PxPi, PxVec3(.0f, .0f, 1.0f))* PxQuat(PxHalfPi + PxHalfPi / 4, PxVec3(-1.0f, 0.0f, 0.0f))), PxVec3(1.0f, 4.0f, 1.0f), 100.0f, 25.0f);
 			trampoline2->AddToScene(this);
 			
 
