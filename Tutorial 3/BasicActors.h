@@ -26,7 +26,7 @@ namespace PhysicsEngine
 		// - pose in 0,0,0
 		// - dimensions: 1m
 		// - denisty: 1kg/m^3
-		Sphere(const PxTransform& pose=PxTransform(PxIdentity), PxReal radius=1.f, PxReal density=0.1f) 
+		Sphere(const PxTransform& pose=PxTransform(PxIdentity), PxReal radius=1.f, PxReal density=0.2f) 
 			: DynamicActor(pose)
 		{ 
 			CreateShape(PxSphereGeometry(radius), density);

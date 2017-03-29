@@ -13,16 +13,29 @@ namespace PhysicsEngine
 		PxVec3(255.f/255.f,45.f/255.f,0.f/255.f),PxVec3(255.f/255.f,140.f/255.f,54.f/255.f),PxVec3(4.f/255.f,117.f/255.f,111.f/255.f),PxVec3(0.f / 255.f,0.f / 255.f,200.f / 255.f) };
 
 	//pyramid vertices						top			top					
-	static PxVec3 pyramid_verts[] = {PxVec3(0.5,5,0.25),PxVec3(-0.5,5,0.25),PxVec3(0.5,5,0.-0.1),PxVec3(-0.5,5,0.-0.1), PxVec3(1,0,1), PxVec3(-1,0,1), PxVec3(-1,0,-1), PxVec3(1,0,-1)};
+	static PxVec3 pyramid_verts[] = {PxVec3(0.5,5,0.25),PxVec3(-0.5,5,0.25),PxVec3(0.5,5,0.-0.25),PxVec3(-0.5,5,0.-0.25), PxVec3(1,0,1), PxVec3(-1,0,1), PxVec3(-1,0,-1), PxVec3(1,0,-1)};
 	//pyramid triangles: a list of three vertices for each triangle e.g. the first triangle consists of vertices 1, 4 and 0
 	//vertices have to be specified in a counter-clockwise order to assure the correct shading in rendering
 	static PxU32 pyramid_trigs[] = {1, 4, 0, 3, 1, 0, 2, 3, 0, 4, 2, 0, 3, 2, 1, 2, 4, 1};
 
+	static PxVec3 flap_verts[] = { PxVec3(1.0,4,0.25),PxVec3(-1.0,4,0.25),PxVec3(1.0,4,-0.25),PxVec3(-1.0,4,-0.25), PxVec3(1.0,0,0.25), PxVec3(-1.0,0,0.25), PxVec3(-1.0,0,-0.25), PxVec3(1.0,0,-0.25) };
+
+	/*static PxVec3 LID_verts[] = { PxVec3(0.0,0.25,0.5),PxVec3(0.0,0.25,0.5), PxVec3(0.0,0.25,-0.5), PxVec3(0.0,0.25,-0.5), PxVec3(-0.5,0.25,0.5), PxVec3(-0.5,0.25,0.5),PxVec3(-0.5,0.25,-0.5),PxVec3(-0.5,0.25,-0.5), };
+	*/
 	class Pyramid : public ConvexMesh
 	{
 	public:
 		Pyramid(PxTransform pose=PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(.5f, .5f, .5f), PxReal density=1.f) :
 			ConvexMesh(vector<PxVec3>(begin(pyramid_verts),end(pyramid_verts)), pose, density)
+		{
+		}
+	};
+
+	class LID : public ConvexMesh
+	{
+	public:
+		LID(PxTransform pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(.5f, .5f, .5f), PxReal density = 0.1f) :
+			ConvexMesh(vector<PxVec3>(begin(flap_verts), end(flap_verts)), pose, density)
 		{
 		}
 	};
@@ -47,7 +60,9 @@ namespace PhysicsEngine
 			CreateShape(PxBoxGeometry(dimensions.x * 3, dimensions.y*2, dimensions.z/2), density);
 			CreateShape(PxBoxGeometry(dimensions.x * 3 , dimensions.y*2, dimensions.z/2), density);
 			CreateShape(PxBoxGeometry(dimensions.x * (dimensions.y * 2), dimensions.y * 4, dimensions.z/4), density);
-			CreateShape(PxBoxGeometry(dimensions.x * (dimensions.y * 2), dimensions.y * 4, dimensions.z / 4), density);
+			CreateShape(PxBoxGeometry(dimensions.x * (dimensions.y * 2), dimensions.y * 4, dimensions.z/4), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y * 3, dimensions.z * 3), density);
+
 		}
 	};
 
@@ -204,11 +219,12 @@ namespace PhysicsEngine
 	{
 		Plane* plane;
 		Box* box, * box2;
+		LID *Flap;
 		CompoundObject* Board;
 		Sphere* ball;
 		Pyramid* Paddle1, *Paddle2;
 		MySimulationEventCallback* my_callback;
-		RevoluteJoint* paddleLeft, *paddleRight;
+		RevoluteJoint* paddleLeft, *paddleRight, *FlapThing;
 		Trampoline* trampoline;
 		
 	public:
@@ -223,6 +239,8 @@ namespace PhysicsEngine
 			px_scene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
 			px_scene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 1.0f);
 			px_scene->setVisualizationParameter(PxVisualizationParameter::eBODY_LIN_VELOCITY, 1.0f);
+			px_scene->setVisualizationParameter(PxVisualizationParameter::eJOINT_LOCAL_FRAMES, 1.0f);
+			px_scene->setVisualizationParameter(PxVisualizationParameter::eJOINT_LIMITS, 1.0f);
 		}
 
 		//Custom scene initialisation
@@ -250,10 +268,11 @@ namespace PhysicsEngine
 			Board->GetShape(4)->setLocalPose(PxTransform(PxVec3(0.0f, 23.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(5)->setLocalPose(PxTransform(PxVec3(0.0f, 27.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(5)->setFlag(PxShapeFlag::eVISUALIZATION, false);
+			Board->GetShape(6)->setLocalPose(PxTransform(PxVec3(16.0f, 25.0f, 10.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->Color(PxVec3(0.0f, 0.0f, 0.0f), 5);
 			Add(Board);
 
-			ball = new Sphere(PxTransform(PxVec3(18.0f, 17.0f, 25.0f)));
+			ball = new Sphere(PxTransform(PxVec3(18.0f, 18.0f, 23.0f)));
 			ball->Color(color_palette[1]);
 			ball->Name("Ball");
 			Add(ball);
@@ -270,6 +289,17 @@ namespace PhysicsEngine
 
 			paddleLeft = new RevoluteJoint(NULL, PxTransform(PxVec3(7.5f,15.0f,30.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi /2, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 			paddleRight = new RevoluteJoint(NULL, PxTransform(PxVec3(-7.5f,15.0f,30.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi /2, PxVec3(0.0f, 0.f, -1.f))), Paddle2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+
+			Flap = new LID(PxTransform(PxVec3(0.0f, 5.0f, 10.0f)));
+			Flap->Color(color_palette[5]);
+			Flap->Name("Flap");
+			Add(Flap);
+
+			//FlapThing = new RevoluteJoint(NULL, PxTransform(PxVec3(15.0f, 32.0f, 30.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi / 2, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+
+			FlapThing = new RevoluteJoint(NULL, PxTransform(PxVec3(15.0f, 32.0f, -10.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, 1.f))), Flap, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+			FlapThing->DriveVelocity(0);
+			FlapThing->SetLimits(PxPi / 4, (PxPi / 2 + PxPi / 8));
 
 			trampoline = new Trampoline(PxTransform(PxVec3(18.0f, 15.0f, 30.0f),PxQuat(PxPi, PxVec3(.0f, .0f, 1.0f))* PxQuat(PxHalfPi + PxHalfPi /4, PxVec3(-1.0f, 0.0f, 0.0f))),PxVec3(1.0f, 4.0f, 1.0f),100.0f , 25.0f);
 			trampoline->AddToScene(this);
@@ -312,11 +342,11 @@ namespace PhysicsEngine
 		}
 
 		/// An example use of key release handling
-		void PaddleL_Release(){	paddleLeft->DriveVelocity(10);}
+		void PaddleL_Release(){	paddleLeft->DriveVelocity(10); FlapThing->DriveVelocity(10);}
 		void PaddleR_Release(){	paddleRight->DriveVelocity(10);}
 
 		/// An example use of key presse handling
-		void PaddleL(){	paddleLeft->DriveVelocity(-10);}
+		void PaddleL(){	paddleLeft->DriveVelocity(-10); FlapThing->DriveVelocity(-10);}
 		void PaddleR(){	paddleRight->DriveVelocity(-10);}
 	};
 }
