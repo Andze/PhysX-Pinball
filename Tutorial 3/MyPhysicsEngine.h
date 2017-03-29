@@ -18,7 +18,7 @@ namespace PhysicsEngine
 	//vertices have to be specified in a counter-clockwise order to assure the correct shading in rendering
 	static PxU32 pyramid_trigs[] = {1, 4, 0, 3, 1, 0, 2, 3, 0, 4, 2, 0, 3, 2, 1, 2, 4, 1};
 
-	static PxVec3 flap_verts[] = { PxVec3(1.0,4,0.25),PxVec3(-1.0,4,0.25),PxVec3(1.0,4,-0.25),PxVec3(-1.0,4,-0.25), PxVec3(1.0,0,0.25), PxVec3(-1.0,0,0.25), PxVec3(-1.0,0,-0.25), PxVec3(1.0,0,-0.25) };
+	static PxVec3 flap_verts[] = { PxVec3(1.25,4,0.25),PxVec3(-1.25,4,0.25),PxVec3(1.25,4,-0.25),PxVec3(-1.25,4,-0.25), PxVec3(1.25,0,0.25), PxVec3(-1.25,0,0.25), PxVec3(-1.25,0,-0.25), PxVec3(1.25,0,-0.25) };
 
 	/*static PxVec3 LID_verts[] = { PxVec3(0.0,0.25,0.5),PxVec3(0.0,0.25,0.5), PxVec3(0.0,0.25,-0.5), PxVec3(0.0,0.25,-0.5), PxVec3(-0.5,0.25,0.5), PxVec3(-0.5,0.25,0.5),PxVec3(-0.5,0.25,-0.5),PxVec3(-0.5,0.25,-0.5), };
 	*/
@@ -287,8 +287,8 @@ namespace PhysicsEngine
 			Paddle2->Name("Paddle2");
 			Add(Paddle2);
 
-			paddleLeft = new RevoluteJoint(NULL, PxTransform(PxVec3(7.5f,15.0f,30.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi /2, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
-			paddleRight = new RevoluteJoint(NULL, PxTransform(PxVec3(-7.5f,15.0f,30.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi /2, PxVec3(0.0f, 0.f, -1.f))), Paddle2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+			paddleLeft = new RevoluteJoint(NULL, PxTransform(PxVec3(7.5f,15.0f,30.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+			paddleRight = new RevoluteJoint(NULL, PxTransform(PxVec3(-7.5f,15.0f,30.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))), Paddle2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 
 			Flap = new LID(PxTransform(PxVec3(0.0f, 5.0f, 10.0f)));
 			Flap->Color(color_palette[5]);
@@ -297,9 +297,9 @@ namespace PhysicsEngine
 
 			//FlapThing = new RevoluteJoint(NULL, PxTransform(PxVec3(15.0f, 32.0f, 30.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi / 2, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 
-			FlapThing = new RevoluteJoint(NULL, PxTransform(PxVec3(15.0f, 32.0f, -10.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, 1.f))), Flap, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
-			FlapThing->DriveVelocity(0);
-			FlapThing->SetLimits(PxPi / 4, (PxPi / 2 + PxPi / 8));
+			FlapThing = new RevoluteJoint(NULL, PxTransform(PxVec3(16.0f, 32.0f, -9.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))), Flap, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+			FlapThing->DriveVelocity(10);
+			FlapThing->SetLimits((PxPi / 10 - PxPi / 8), (PxPi / 2 + PxPi / 8));
 
 			trampoline = new Trampoline(PxTransform(PxVec3(18.0f, 15.0f, 30.0f),PxQuat(PxPi, PxVec3(.0f, .0f, 1.0f))* PxQuat(PxHalfPi + PxHalfPi /4, PxVec3(-1.0f, 0.0f, 0.0f))),PxVec3(1.0f, 4.0f, 1.0f),100.0f , 25.0f);
 			trampoline->AddToScene(this);
@@ -336,17 +336,18 @@ namespace PhysicsEngine
 
 		void Plunge() {			
 			trampoline->Plunge(25.0f);
+			FlapThing->DriveVelocity(-10);
 		}
 		void Plunge_Release() { 
 			trampoline->Plunge(0.0f);
 		}
 
 		/// An example use of key release handling
-		void PaddleL_Release(){	paddleLeft->DriveVelocity(10); FlapThing->DriveVelocity(10);}
+		void PaddleL_Release(){	paddleLeft->DriveVelocity(10);}
 		void PaddleR_Release(){	paddleRight->DriveVelocity(10);}
 
 		/// An example use of key presse handling
-		void PaddleL(){	paddleLeft->DriveVelocity(-10); FlapThing->DriveVelocity(-10);}
+		void PaddleL(){	paddleLeft->DriveVelocity(-10); FlapThing->DriveVelocity(10);}
 		void PaddleR(){	paddleRight->DriveVelocity(-10);}
 	};
 }
