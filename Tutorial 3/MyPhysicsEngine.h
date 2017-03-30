@@ -13,7 +13,7 @@ namespace PhysicsEngine
 		PxVec3(255.f/255.f,45.f/255.f,0.f/255.f),PxVec3(255.f/255.f,140.f/255.f,54.f/255.f),PxVec3(4.f/255.f,117.f/255.f,111.f/255.f),PxVec3(0.f / 255.f,0.f / 255.f,200.f / 255.f) };
 
 	//pyramid vertices						top			top					
-	static PxVec3 pyramid_verts[] = {PxVec3(0.5,4,0.25),PxVec3(-0.5,4,0.25),PxVec3(0.5,4,0.-0.25),PxVec3(-0.5,4,0.-0.25), PxVec3(1,0,0.5), PxVec3(-1,0,0.5), PxVec3(-1,0,-0.5), PxVec3(1,0,-0.5)};
+	static PxVec3 pyramid_verts[] = {PxVec3(0.5,4,0.25),PxVec3(-0.5,4,0.25),PxVec3(0.5,4,-0.25),PxVec3(-0.5,4,-0.25), PxVec3(1,0,0.5), PxVec3(-1,0,0.5), PxVec3(-1,0,-0.5), PxVec3(1,0,-0.5)};
 	//pyramid triangles: a list of three vertices for each triangle e.g. the first triangle consists of vertices 1, 4 and 0
 	//vertices have to be specified in a counter-clockwise order to assure the correct shading in rendering
 	static PxU32 pyramid_trigs[] = {1, 4, 0, 3, 1, 0, 2, 3, 0, 4, 2, 0, 3, 2, 1, 2, 4, 1};
@@ -22,11 +22,22 @@ namespace PhysicsEngine
 
 	/*static PxVec3 LID_verts[] = { PxVec3(0.0,0.25,0.5),PxVec3(0.0,0.25,0.5), PxVec3(0.0,0.25,-0.5), PxVec3(0.0,0.25,-0.5), PxVec3(-0.5,0.25,0.5), PxVec3(-0.5,0.25,0.5),PxVec3(-0.5,0.25,-0.5),PxVec3(-0.5,0.25,-0.5), };
 	*/
+	static PxVec3 Hex_verts[] = { PxVec3(0.5,3,0.25),PxVec3(0.5,3,0.25), PxVec3(1,0,0.5), PxVec3(-1,0,0.5), PxVec3(-1,0,-0.5), PxVec3(1,0,-0.5), PxVec3(0.5,-3,0.25),PxVec3(0.5,-3,0.25), PxVec3(1,0,0.5), PxVec3(-1,0,0.5), PxVec3(-1,0,-0.5), PxVec3(1,0,-0.5) };
+
 	class Pyramid : public ConvexMesh
 	{
 	public:
-		Pyramid(PxTransform pose=PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(.5f, .5f, .5f), PxReal density=1.f) :
+		Pyramid(PxTransform pose=PxTransform(PxIdentity), PxReal side = PxReal(0.5f), PxReal density=1.f) :
 			ConvexMesh(vector<PxVec3>(begin(pyramid_verts),end(pyramid_verts)), pose, density)
+		{
+		}
+	};
+
+	class Hex : public ConvexMesh
+	{
+	public:
+		Hex(PxTransform pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(.5f, .5f, .5f), PxReal density = 1.f) :
+			ConvexMesh(vector<PxVec3>(begin(Hex_verts), end(Hex_verts)), pose, density)
 		{
 		}
 	};
@@ -138,9 +149,10 @@ namespace PhysicsEngine
 	{
 	public:
 		//an example variable that will be checked in the main simulation loop
-		bool trigger;
+		bool killed;
+		bool Flipped;
 
-		MySimulationEventCallback() : trigger(false) {}
+		//MySimulationEventCallback() : trigger(false) {}
 
 		///Method called when the contact with the trigger object is detected.
 		virtual void onTrigger(PxTriggerPair* pairs, PxU32 count) 
@@ -151,15 +163,29 @@ namespace PhysicsEngine
 				//filter out contact with the planes
 				if (pairs[i].otherShape->getGeometryType() != PxGeometryType::ePLANE)
 				{
+					//string actorNames pairs[i]->get();
 					//check if eNOTIFY_TOUCH_FOUND trigger
 					if (pairs[i].status & PxPairFlag::eNOTIFY_TOUCH_FOUND)
 					{
-						trigger = true;
+					string triggerName = std::string(pairs[i].triggerActor->getName());
+					string otherName = std::string(pairs[i].otherActor->getName());
+
+					if (triggerName == "DeadZone")
+						if (otherName == "Ball")
+							killed = true;
+
+					if (triggerName == "Flip")
+						if (otherName == "Ball")
+							Flipped = true;
 					}
 					//check if eNOTIFY_TOUCH_LOST trigger
 					if (pairs[i].status & PxPairFlag::eNOTIFY_TOUCH_LOST)
 					{
-						trigger = false;
+						/*string triggerName = std::string(pairs[i].triggerActor->getName());
+						string otherName = std::string(pairs[i].otherActor->getName());
+
+						if (triggerName == "DeadZone")
+								killed = false;*/
 					}
 				}
 			}
@@ -232,9 +258,10 @@ namespace PhysicsEngine
 		LID *Flap;
 		CompoundObject* Board;
 		Sphere* ball;
+		Hex* Spinner,* Spinner2,* Spinner3;
 		Pyramid* Paddle1, *Paddle2;
 		MySimulationEventCallback* my_callback;
-		RevoluteJoint* paddleLeft, *paddleRight, *FlapThing;
+		RevoluteJoint* paddleLeft, *paddleRight, *FlapThing, *SpinnerJoint, *SpinnerJoint2,* SpinnerJoint3;
 		Trampoline* trampoline, *trampoline2;
 		
 	public:
@@ -320,17 +347,36 @@ namespace PhysicsEngine
 
 			paddleLeft = new RevoluteJoint(NULL, PxTransform(PxVec3(5.5f,13.5f,35.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 			paddleRight = new RevoluteJoint(NULL, PxTransform(PxVec3(-5.5f,13.5f,35.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))), Paddle2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+			paddleLeft->SetLimits(PxPi / 4, (PxPi / 2 + PxPi / 8));
+			paddleRight->SetLimits(PxPi / 4, (PxPi / 2 + PxPi / 8));
 
 			Flap = new LID(PxTransform(PxVec3(0.0f, 5.0f, 10.0f)));
 			Flap->Color(color_palette[5]);
 			Flap->Name("Flap");
 			Add(Flap);
 
-			//FlapThing = new RevoluteJoint(NULL, PxTransform(PxVec3(15.0f, 32.0f, 30.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi / 2, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
-
 			FlapThing = new RevoluteJoint(NULL, PxTransform(PxVec3(16.0f, 32.0f, -9.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))), Flap, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 			FlapThing->SetLimits((PxPi / 10 - PxPi / 8), (PxPi / 2 + PxPi / 8));
 			FlapThing->DriveVelocity(-10);
+
+			Spinner = new Hex(PxTransform(PxVec3(0.0f, 5.0f, 10.0f)));
+			Spinner->Color(color_palette[5]);
+			Spinner->Name("Spinner");
+			Add(Spinner);
+
+			Spinner2 = new Hex(PxTransform(PxVec3(0.0f, 5.0f, 10.0f)));
+			Spinner2->Color(color_palette[5]);
+			Spinner2->Name("Spinner2");
+			Add(Spinner2);
+
+			Spinner3 = new Hex(PxTransform(PxVec3(0.0f, 5.0f, 10.0f)));
+			Spinner3->Color(color_palette[5]);
+			Spinner3->Name("Spinner3");
+			Add(Spinner3);
+
+			SpinnerJoint = new RevoluteJoint(NULL, PxTransform(PxVec3(0.0f, 34.0f, -15.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))), Spinner, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+			SpinnerJoint2 = new RevoluteJoint(NULL, PxTransform(PxVec3(5.0f, 29.5f, -5.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))), Spinner2, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
+			SpinnerJoint3 = new RevoluteJoint(NULL, PxTransform(PxVec3(-5.0f, 29.5f, -5.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))), Spinner3, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 
 			trampoline = new Trampoline(PxTransform(PxVec3(18.0f, 15.0f, 30.0f),PxQuat(PxPi, PxVec3(.0f, .0f, 1.0f))* PxQuat(PxHalfPi + PxHalfPi /4, PxVec3(-1.0f, 0.0f, 0.0f))),PxVec3(1.0f, 4.0f, 1.0f),100.0f , 25.0f);
 			trampoline->AddToScene(this);
@@ -373,9 +419,14 @@ namespace PhysicsEngine
 		//Custom udpate function
 		virtual void CustomUpdate() 
 		{
-			if (my_callback->trigger == true)
+			SpinnerJoint->DriveVelocity(8);
+			SpinnerJoint2->DriveVelocity(-7);
+			SpinnerJoint3->DriveVelocity(6);
+
+			if (my_callback->killed == true)
 			{
 				std::cout<<"Dead"<< endl;
+				my_callback->killed = false;
 				resetBall();
 			}
 		}
@@ -386,6 +437,7 @@ namespace PhysicsEngine
 			((PxActor*)ball->Get())->release();
 			ball = new Sphere(PxTransform(PxVec3(18.0f, 18.0f, 23.0f)));
 			Add(ball);
+			ball->Name("Ball");
 			FlapThing->DriveVelocity(-10);
 		}
 
