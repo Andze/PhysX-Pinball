@@ -70,6 +70,11 @@ namespace PhysicsEngine
 			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 - dimensions.y /8 , dimensions.z * 3), density);
 			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 , dimensions.z * 3), density);
 			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 - dimensions.y / 8, dimensions.z * 3), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 - dimensions.y / 5, dimensions.z * 3), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 , dimensions.z * 3), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 , dimensions.z * 3), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 , dimensions.z * 3), density);
+			CreateShape(PxBoxGeometry(dimensions.x / 2, dimensions.y / 2 , dimensions.z * 3), density);;
 		}
 	};
 
@@ -149,13 +154,11 @@ namespace PhysicsEngine
 					//check if eNOTIFY_TOUCH_FOUND trigger
 					if (pairs[i].status & PxPairFlag::eNOTIFY_TOUCH_FOUND)
 					{
-						cerr << "onTrigger::eNOTIFY_TOUCH_FOUND" << endl;
 						trigger = true;
 					}
 					//check if eNOTIFY_TOUCH_LOST trigger
 					if (pairs[i].status & PxPairFlag::eNOTIFY_TOUCH_LOST)
 					{
-						cerr << "onTrigger::eNOTIFY_TOUCH_LOST" << endl;
 						trigger = false;
 					}
 				}
@@ -225,7 +228,7 @@ namespace PhysicsEngine
 	{
 		Plane* plane;
 		Box* box, * box2;
-		BoxStatic *Trigger;
+		BoxStatic *Trigger, *Trigger2;
 		LID *Flap;
 		CompoundObject* Board;
 		Sphere* ball;
@@ -289,6 +292,13 @@ namespace PhysicsEngine
 			Board->GetShape(12)->setLocalPose(PxTransform(PxVec3(9.0f, 25.0f, 25.25f), PxQuat(-PxHalfPi / 2 - PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(14)->setLocalPose(PxTransform(PxVec3(12.0f, 25.0f, 19.25f), PxQuat(PxPi, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(13)->setLocalPose(PxTransform(PxVec3(-10.0f, 25.0f, 24.25f), PxQuat(PxHalfPi / 2 + PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			Board->GetShape(15)->setLocalPose(PxTransform(PxVec3(-14.0f, 25.0f, 19.25f), PxQuat(PxPi, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			//Middle Triangle
+			Board->GetShape(16)->setLocalPose(PxTransform(PxVec3(-15.5f, 25.0f, -3.0f), PxQuat(PxHalfPi / 2 + PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			Board->GetShape(17)->setLocalPose(PxTransform(PxVec3(-15.5f, 25.0f, 2.25f), PxQuat(-PxHalfPi / 2 - PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+
+			Board->GetShape(18)->setLocalPose(PxTransform(PxVec3(11.75f, 25.0f, 2.25f), PxQuat(PxHalfPi / 2 + PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			Board->GetShape(19)->setLocalPose(PxTransform(PxVec3(11.75f, 25.0f, -3.0f), PxQuat(-PxHalfPi / 2 - PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 
 			Board->Color(PxVec3(0.0f, 0.0f, 0.0f), 4);
 			Add(Board);
@@ -319,8 +329,8 @@ namespace PhysicsEngine
 			//FlapThing = new RevoluteJoint(NULL, PxTransform(PxVec3(15.0f, 32.0f, 30.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi / 2, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
 
 			FlapThing = new RevoluteJoint(NULL, PxTransform(PxVec3(16.0f, 32.0f, -9.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))), Flap, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
-			FlapThing->DriveVelocity(10);
 			FlapThing->SetLimits((PxPi / 10 - PxPi / 8), (PxPi / 2 + PxPi / 8));
+			FlapThing->DriveVelocity(-10);
 
 			trampoline = new Trampoline(PxTransform(PxVec3(18.0f, 15.0f, 30.0f),PxQuat(PxPi, PxVec3(.0f, .0f, 1.0f))* PxQuat(PxHalfPi + PxHalfPi /4, PxVec3(-1.0f, 0.0f, 0.0f))),PxVec3(1.0f, 4.0f, 1.0f),100.0f , 25.0f);
 			trampoline->AddToScene(this);
@@ -337,10 +347,15 @@ namespace PhysicsEngine
 			// box2->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
 		
 			Trigger = new BoxStatic(PxTransform(PxVec3(0.0f, 9.0f, 45.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))),PxVec3(2.0f,2.0f,12.0f));
-			Trigger->Name("Trigger");
+			Trigger->Name("DeadZone");
 			Add(Trigger);
 			Trigger->SetTrigger(true);
 			Trigger->GetShape(0)->setFlag(PxShapeFlag::eVISUALIZATION, false);
+
+		/*	Trigger2 = new BoxStatic(PxTransform(PxVec3(0.0f, 9.0f, 45.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))), PxVec3(2.0f, 2.0f, 12.0f));
+			Add(Trigger2);
+			Trigger2->SetTrigger(true);
+			Trigger2->GetShape(0)->setFlag(PxShapeFlag::eVISUALIZATION, false);*/
 
 			/*
 			box2 = new Box(PxTransform(PxVec3(.0f, 12.5f, .0f)));
@@ -371,16 +386,16 @@ namespace PhysicsEngine
 			((PxActor*)ball->Get())->release();
 			ball = new Sphere(PxTransform(PxVec3(18.0f, 18.0f, 23.0f)));
 			Add(ball);
+			FlapThing->DriveVelocity(-10);
 		}
 
 		void Plunge() {			
-			trampoline->Plunge(30.0f);
-			FlapThing->DriveVelocity(-10);
+			trampoline->Plunge(30.0f);	
 		}
 		void Plunge_Release() {trampoline->Plunge(0.0f);}
 
-		void Tilt_Release() {trampoline2->Plunge(9.0f);}
-		void Tilt() {trampoline2->Plunge(15.0f);}
+		void Tilt_Release() {trampoline2->Plunge(0.0f);}
+		void Tilt() {trampoline2->Plunge(30.0f);}
 
 		void PaddleL_Release(){	paddleLeft->DriveVelocity(10);}
 		void PaddleR_Release(){	paddleRight->DriveVelocity(10);}
