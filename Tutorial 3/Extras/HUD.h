@@ -28,6 +28,11 @@ namespace VisualDebugger
 		{
 			content.push_back(line);
 		}
+		///Add a single line of text
+		void EditLine(string line, int index)
+		{
+			content[index] = line;
+		}
 
 		///Render the screen
 		void Render()
@@ -70,6 +75,12 @@ namespace VisualDebugger
 
 			screens.push_back(new HUDScreen(screen_id));
 			screens.back()->AddLine(line);
+		}
+
+		void EditLine(int screen_id, string line, int index)
+		{
+			screens[screen_id]->EditLine(line,index);
+			return;
 		}
 
 		///Set the active screen

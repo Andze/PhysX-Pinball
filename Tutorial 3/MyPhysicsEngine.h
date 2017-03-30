@@ -3,6 +3,7 @@
 #include "BasicActors.h"
 #include <iostream>
 #include <iomanip>
+#include "VisualDebugger.h"
 
 namespace PhysicsEngine
 {
@@ -20,8 +21,6 @@ namespace PhysicsEngine
 
 	static PxVec3 flap_verts[] = { PxVec3(1.25,4,0.25),PxVec3(-1.25,4,0.25),PxVec3(1.25,4,-0.25),PxVec3(-1.25,4,-0.25), PxVec3(1.25,0,0.25), PxVec3(-1.25,0,0.25), PxVec3(-1.25,0,-0.25), PxVec3(1.25,0,-0.25) };
 
-	/*static PxVec3 LID_verts[] = { PxVec3(0.0,0.25,0.5),PxVec3(0.0,0.25,0.5), PxVec3(0.0,0.25,-0.5), PxVec3(0.0,0.25,-0.5), PxVec3(-0.5,0.25,0.5), PxVec3(-0.5,0.25,0.5),PxVec3(-0.5,0.25,-0.5),PxVec3(-0.5,0.25,-0.5), };
-	*/
 	static PxVec3 Hex_verts[] = { PxVec3(0.5,3,0.25),PxVec3(0.5,3,0.25), PxVec3(1,0,0.5), PxVec3(-1,0,0.5), PxVec3(-1,0,-0.5), PxVec3(1,0,-0.5), PxVec3(0.5,-3,0.25),PxVec3(0.5,-3,0.25), PxVec3(1,0,0.5), PxVec3(-1,0,0.5), PxVec3(-1,0,-0.5), PxVec3(1,0,-0.5) };
 
 	class Pyramid : public ConvexMesh
@@ -174,7 +173,7 @@ namespace PhysicsEngine
 						if (otherName == "Ball")
 							killed = true;
 
-					if (triggerName == "Flip")
+					if (triggerName == "Flipped")
 						if (otherName == "Ball")
 							Flipped = true;
 					}
@@ -250,8 +249,10 @@ namespace PhysicsEngine
 		return PxFilterFlags();
 	};
 	///Custom scene class
+
 	class MyScene : public Scene
 	{
+		
 		Plane* plane;
 		Box* box, * box2;
 		BoxStatic *Trigger, *Trigger2;
@@ -265,6 +266,8 @@ namespace PhysicsEngine
 		Trampoline* trampoline, *trampoline2;
 		
 	public:
+		int Score = 0;
+		int Lives = 5;
 		//specify your custom filter shader here
 		//PxDefaultSimulationFilterShader by default
 		MyScene() : Scene() {};
@@ -328,21 +331,24 @@ namespace PhysicsEngine
 			Board->GetShape(19)->setLocalPose(PxTransform(PxVec3(11.75f, 25.0f, -3.0f), PxQuat(-PxHalfPi / 2 - PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 
 			Board->Color(PxVec3(0.0f, 0.0f, 0.0f), 4);
+			Board->Material(CreateMaterial(0.0f,0.0f,0.5f));
 			Add(Board);
 
 			ball = new Sphere(PxTransform(PxVec3(18.0f, 18.0f, 23.0f)));
-			ball->Color(color_palette[1]);
 			ball->Name("Ball");
+			ball->Material(CreateMaterial(0.78f, 0.27f, 0.39f));
 			Add(ball);
 			
 			Paddle1 = new Pyramid(PxTransform(PxVec3(0.0f, 5.0f, 5.0f)));
 			Paddle1->Color(color_palette[0]);
 			Paddle1->Name("Paddle1");
+			Paddle1->Material(CreateMaterial(0.78f, 0.27f, 0.39f));
 			Add(Paddle1);
 
 			Paddle2 = new Pyramid(PxTransform(PxVec3(0.0f, 5.0f, 10.0f)));
 			Paddle2->Color(color_palette[1]);
 			Paddle2->Name("Paddle2");
+			Paddle2->Material(CreateMaterial(0.78f, 0.27f, 0.39f));
 			Add(Paddle2);
 
 			paddleLeft = new RevoluteJoint(NULL, PxTransform(PxVec3(5.5f,13.5f,35.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
@@ -353,6 +359,8 @@ namespace PhysicsEngine
 			Flap = new LID(PxTransform(PxVec3(0.0f, 5.0f, 10.0f)));
 			Flap->Color(color_palette[5]);
 			Flap->Name("Flap");
+			//Parrallel Oak
+			Flap->Material(CreateMaterial(0.62f, 0.48f, 0.f));
 			Add(Flap);
 
 			FlapThing = new RevoluteJoint(NULL, PxTransform(PxVec3(16.0f, 32.0f, -9.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))), Flap, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
@@ -398,10 +406,11 @@ namespace PhysicsEngine
 			Trigger->SetTrigger(true);
 			Trigger->GetShape(0)->setFlag(PxShapeFlag::eVISUALIZATION, false);
 
-		/*	Trigger2 = new BoxStatic(PxTransform(PxVec3(0.0f, 9.0f, 45.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))), PxVec3(2.0f, 2.0f, 12.0f));
+			Trigger2 = new BoxStatic(PxTransform(PxVec3(18.0f, 34.0f, -17.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))), PxVec3(2.0f, 2.0f, 1.0f));
 			Add(Trigger2);
+			Trigger2->Name("Flipped");
 			Trigger2->SetTrigger(true);
-			Trigger2->GetShape(0)->setFlag(PxShapeFlag::eVISUALIZATION, false);*/
+			Trigger2->GetShape(0)->setFlag(PxShapeFlag::eVISUALIZATION, false);
 
 			/*
 			box2 = new Box(PxTransform(PxVec3(.0f, 12.5f, .0f)));
@@ -419,7 +428,8 @@ namespace PhysicsEngine
 		//Custom udpate function
 		virtual void CustomUpdate() 
 		{
-			SpinnerJoint->DriveVelocity(8);
+			Score++;
+			SpinnerJoint->DriveVelocity(-8);
 			SpinnerJoint2->DriveVelocity(-7);
 			SpinnerJoint3->DriveVelocity(6);
 
@@ -429,6 +439,12 @@ namespace PhysicsEngine
 				my_callback->killed = false;
 				resetBall();
 			}
+			if (my_callback->Flipped == true)
+			{
+				std::cout << "Dead" << endl;
+				FlapThing->DriveVelocity(10);
+				my_callback->Flipped = false;
+			}
 		}
 
 		void resetBall()
@@ -437,6 +453,13 @@ namespace PhysicsEngine
 			((PxActor*)ball->Get())->release();
 			ball = new Sphere(PxTransform(PxVec3(18.0f, 18.0f, 23.0f)));
 			Add(ball);
+			Lives--;
+			if (Lives < 0)
+			{
+				Lives = 5;
+				Score = 0;
+			}
+			ball->Material(CreateMaterial(0.78f, 0.27f, 0.39f));
 			ball->Name("Ball");
 			FlapThing->DriveVelocity(-10);
 		}
@@ -452,7 +475,7 @@ namespace PhysicsEngine
 		void PaddleL_Release(){	paddleLeft->DriveVelocity(10);}
 		void PaddleR_Release(){	paddleRight->DriveVelocity(10);}
 
-		void PaddleL(){	paddleLeft->DriveVelocity(-10); FlapThing->DriveVelocity(10);}
+		void PaddleL(){	paddleLeft->DriveVelocity(-10);}
 		void PaddleR(){	paddleRight->DriveVelocity(-10);}
 	};
 }
