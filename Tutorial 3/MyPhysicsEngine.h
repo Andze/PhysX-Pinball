@@ -336,6 +336,7 @@ namespace PhysicsEngine
 
 			ball = new Sphere(PxTransform(PxVec3(18.0f, 18.0f, 23.0f)));
 			ball->Name("Ball");
+			ball->Color(color_palette[1]);
 			ball->Material(CreateMaterial(0.78f, 0.27f, 0.39f));
 			Add(ball);
 			
@@ -441,7 +442,7 @@ namespace PhysicsEngine
 			}
 			if (my_callback->Flipped == true)
 			{
-				std::cout << "Dead" << endl;
+				std::cout << "Flipper" << endl;
 				FlapThing->DriveVelocity(10);
 				my_callback->Flipped = false;
 			}
@@ -459,6 +460,7 @@ namespace PhysicsEngine
 				Lives = 5;
 				Score = 0;
 			}
+			ball->Color(color_palette[1]);
 			ball->Material(CreateMaterial(0.78f, 0.27f, 0.39f));
 			ball->Name("Ball");
 			FlapThing->DriveVelocity(-10);
