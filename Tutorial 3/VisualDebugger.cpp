@@ -139,7 +139,7 @@ namespace VisualDebugger
 		KeyHold();
 
 		string stringScore = "Score:  ";
-		stringScore += std::to_string(scene->Score);
+		stringScore += std::to_string(scene->getScore());
 		hud.EditLine(HELP, stringScore,0);
 
 		string stringLives = "Lives:  ";

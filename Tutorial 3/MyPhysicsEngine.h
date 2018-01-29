@@ -8,7 +8,7 @@
 namespace PhysicsEngine
 {
 	using namespace std;
-
+	static int Score = 0;
 	//a list of colours: Circus Palette
 	static const PxVec3 color_palette[] = {PxVec3(46.f/255.f,9.f/255.f,39.f/255.f),PxVec3(217.f/255.f,0.f/255.f,0.f/255.f),
 		PxVec3(255.f/255.f,45.f/255.f,0.f/255.f),PxVec3(255.f/255.f,140.f/255.f,54.f/255.f),PxVec3(4.f/255.f,117.f/255.f,111.f/255.f),PxVec3(0.f / 255.f,0.f / 255.f,200.f / 255.f) };
@@ -150,6 +150,7 @@ namespace PhysicsEngine
 		//an example variable that will be checked in the main simulation loop
 		bool killed;
 		bool Flipped;
+		bool Score;
 
 		//MySimulationEventCallback() : trigger(false) {}
 
@@ -176,6 +177,11 @@ namespace PhysicsEngine
 					if (triggerName == "Flipped")
 						if (otherName == "Ball")
 							Flipped = true;
+
+
+					if (triggerName == "Score")
+						if (otherName == "Ball")
+							Score = true; 
 					}
 					//check if eNOTIFY_TOUCH_LOST trigger
 					if (pairs[i].status & PxPairFlag::eNOTIFY_TOUCH_LOST)
@@ -198,15 +204,18 @@ namespace PhysicsEngine
 			//check all pairs
 			for (PxU32 i = 0; i < nbPairs; i++)
 			{
-				//check eNOTIFY_TOUCH_FOUND
-				if (pairs[i].events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
+
+				switch (pairs[i].shapes[0]->getSimulationFilterData().word0)
 				{
-					cerr << "onContact::eNOTIFY_TOUCH_FOUND" << endl;
-				}
-				//check eNOTIFY_TOUCH_LOST
-				if (pairs[i].events & PxPairFlag::eNOTIFY_TOUCH_LOST)
-				{
-					cerr << "onContact::eNOTIFY_TOUCH_LOST" << endl;
+				case FilterGroup::ACTOR0:
+					Score += 100;
+					break;
+				case FilterGroup::ACTOR1:
+					Score += 1000;
+					break;
+				case FilterGroup::ACTOR2:
+					Score += 500;
+					break;
 				}
 			}
 		}
@@ -230,11 +239,14 @@ namespace PhysicsEngine
 
 		pairFlags = PxPairFlag::eCONTACT_DEFAULT;
 		//enable continous collision detection
-//		pairFlags |= PxPairFlag::eCCD_LINEAR;
-		
+    	pairFlags |= PxPairFlag::eCCD_LINEAR;
+		pairFlags = PxPairFlag::eSOLVE_CONTACT;
+		pairFlags |= PxPairFlag::eDETECT_DISCRETE_CONTACT;
+		pairFlags |= PxPairFlag::eDETECT_CCD_CONTACT;
 		
 		//customise collision filtering here
 		//e.g.
+
 
 		// trigger the contact callback for pairs (A,B) where 
 		// the filtermask of A contains the ID of B and vice versa.
@@ -255,7 +267,7 @@ namespace PhysicsEngine
 		
 		Plane* plane;
 		Box* box, * box2;
-		BoxStatic *Trigger, *Trigger2;
+		BoxStatic *Trigger, *Trigger2, *Trigger3;
 		LID *Flap;
 		CompoundObject* Board;
 		Sphere* ball;
@@ -266,7 +278,7 @@ namespace PhysicsEngine
 		Trampoline* trampoline, *trampoline2;
 		
 	public:
-		int Score = 0;
+	
 		int Lives = 5;
 		//specify your custom filter shader here
 		//PxDefaultSimulationFilterShader by default
@@ -290,7 +302,7 @@ namespace PhysicsEngine
 
 			GetMaterial()->setDynamicFriction(.2f);
 
-			///Initialise and set the customised event callback
+			///Initialise and set the customised event callback for trigger handling
 			my_callback = new MySimulationEventCallback();
 			px_scene->setSimulationEventCallback(my_callback);
 			
@@ -301,6 +313,9 @@ namespace PhysicsEngine
 			Board = new CompoundObject(PxTransform(PxVec3(0.0f, 0.5f, 0.0f), PxQuat(PxHalfPi / 4, PxVec3(1.0f, 0.f, 0.f))),PxVec3(1.0f,10.0f,1.0f));
 			Board->Color(color_palette[5]);
 			Board->Name("GameBoard");
+
+			//------------------------------------------------------------------------------------------------------------------------------------------------
+			//Board Placement
 			Board->GetShape(0)->setLocalPose(PxTransform(PxVec3(20.0f, 25.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(1)->setLocalPose(PxTransform(PxVec3(-20.0f, 25.0f, 0.0f), PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(2)->setLocalPose(PxTransform(PxVec3(0.0f, 25.0f, 40.0f), PxQuat(PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))));
@@ -326,9 +341,9 @@ namespace PhysicsEngine
 			//Middle Triangle
 			Board->GetShape(16)->setLocalPose(PxTransform(PxVec3(-15.5f, 25.0f, -3.0f), PxQuat(PxHalfPi / 2 + PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(17)->setLocalPose(PxTransform(PxVec3(-15.5f, 25.0f, 2.25f), PxQuat(-PxHalfPi / 2 - PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
-
 			Board->GetShape(18)->setLocalPose(PxTransform(PxVec3(11.75f, 25.0f, 2.25f), PxQuat(PxHalfPi / 2 + PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
 			Board->GetShape(19)->setLocalPose(PxTransform(PxVec3(11.75f, 25.0f, -3.0f), PxQuat(-PxHalfPi / 2 - PxHalfPi / 8, PxVec3(0.0f, 1.0f, 0.0f))*PxQuat(PxHalfPi, PxVec3(1.0f, 0.0f, 0.0f))));
+			//---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 			Board->Color(PxVec3(0.0f, 0.0f, 0.0f), 4);
 			Board->Material(CreateMaterial(0.0f,0.0f,0.5f));
@@ -337,19 +352,22 @@ namespace PhysicsEngine
 			ball = new Sphere(PxTransform(PxVec3(18.0f, 18.0f, 23.0f)));
 			ball->Name("Ball");
 			ball->Color(color_palette[1]);
-			ball->Material(CreateMaterial(0.78f, 0.27f, 0.39f));
+			ball->Material(CreateMaterial(0.78f, .27f, 0.39));
+			((PxRigidBody*)ball->Get())->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD,true);
 			Add(ball);
 			
 			Paddle1 = new Pyramid(PxTransform(PxVec3(0.0f, 5.0f, 5.0f)));
-			Paddle1->Color(color_palette[0]);
+			Paddle1->Color(color_palette[1]);
 			Paddle1->Name("Paddle1");
 			Paddle1->Material(CreateMaterial(0.78f, 0.27f, 0.39f));
+			((PxRigidBody*)Paddle1->Get())->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 			Add(Paddle1);
 
 			Paddle2 = new Pyramid(PxTransform(PxVec3(0.0f, 5.0f, 10.0f)));
 			Paddle2->Color(color_palette[1]);
 			Paddle2->Name("Paddle2");
 			Paddle2->Material(CreateMaterial(0.78f, 0.27f, 0.39f));
+			((PxRigidBody*)Paddle2->Get())->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 			Add(Paddle2);
 
 			paddleLeft = new RevoluteJoint(NULL, PxTransform(PxVec3(5.5f,13.5f,35.0f), PxQuat(PxPi / 2, PxVec3(0.f, -1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, 1.f))), Paddle1, PxTransform(PxVec3(0.f, 0.0f, 0.f)));
@@ -360,7 +378,7 @@ namespace PhysicsEngine
 			Flap = new LID(PxTransform(PxVec3(0.0f, 5.0f, 10.0f)));
 			Flap->Color(color_palette[5]);
 			Flap->Name("Flap");
-			//Parrallel Oak
+			//Parrallel Oak material
 			Flap->Material(CreateMaterial(0.62f, 0.48f, 0.f));
 			Add(Flap);
 
@@ -369,17 +387,17 @@ namespace PhysicsEngine
 			FlapThing->DriveVelocity(-10);
 
 			Spinner = new Hex(PxTransform(PxVec3(0.0f, 5.0f, 10.0f)));
-			Spinner->Color(color_palette[5]);
+			Spinner->Color(color_palette[1]);
 			Spinner->Name("Spinner");
 			Add(Spinner);
 
 			Spinner2 = new Hex(PxTransform(PxVec3(0.0f, 5.0f, 10.0f)));
-			Spinner2->Color(color_palette[5]);
+			Spinner2->Color(color_palette[4]);
 			Spinner2->Name("Spinner2");
 			Add(Spinner2);
 
 			Spinner3 = new Hex(PxTransform(PxVec3(0.0f, 5.0f, 10.0f)));
-			Spinner3->Color(color_palette[5]);
+			Spinner3->Color(color_palette[3]);
 			Spinner3->Name("Spinner3");
 			Add(Spinner3);
 
@@ -395,17 +413,23 @@ namespace PhysicsEngine
 			
 
 			//set collision filter flags
-			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
+			Spinner->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
 			//use | operator to combine more actors e.g.
-			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2);
+			//Spinner->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2);
 			//don't forget to set your flags for the matching actor as well, e.g.
-			// box2->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
+			ball->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2);
 		
 			Trigger = new BoxStatic(PxTransform(PxVec3(0.0f, 9.0f, 45.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))),PxVec3(2.0f,2.0f,12.0f));
 			Trigger->Name("DeadZone");
 			Add(Trigger);
 			Trigger->SetTrigger(true);
 			Trigger->GetShape(0)->setFlag(PxShapeFlag::eVISUALIZATION, false);
+
+			Trigger3 = new BoxStatic(PxTransform(PxVec3(0.0f, 35.0f, -15.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))), PxVec3(3.0f, 3.0f, 3.0f));
+			Trigger3->Name("Score");
+			Add(Trigger3);
+			Trigger3->SetTrigger(true);
+			Trigger3->GetShape(0)->setFlag(PxShapeFlag::eVISUALIZATION, false);
 
 			Trigger2 = new BoxStatic(PxTransform(PxVec3(18.0f, 34.0f, -17.0f), PxQuat(PxPi / 2, PxVec3(0.f, 1.f, 0.f)) * PxQuat(PxHalfPi - PxHalfPi / 4, PxVec3(0.0f, 0.f, -1.f))), PxVec3(2.0f, 2.0f, 1.0f));
 			Add(Trigger2);
@@ -425,11 +449,11 @@ namespace PhysicsEngine
 			//RevoluteJoint joint(box, PxTransform(PxVec3(0.f,0.f,0.f), PxQuat(PxPi/2,PxVec3(0.f,1.f,0.f))), box2, PxTransform(PxVec3(0.f,5.f,0.f)));
 			
 		}
-
 		//Custom udpate function
 		virtual void CustomUpdate() 
 		{
 			Score++;
+
 			SpinnerJoint->DriveVelocity(-8);
 			SpinnerJoint2->DriveVelocity(-7);
 			SpinnerJoint3->DriveVelocity(6);
@@ -446,6 +470,17 @@ namespace PhysicsEngine
 				FlapThing->DriveVelocity(10);
 				my_callback->Flipped = false;
 			}
+			if (my_callback->Score == true)
+			{
+				std::cout << "Points" << endl;
+				Score = Score += 100;
+				my_callback->Score = false;
+			}
+		}
+
+		virtual int getScore()
+		{
+			return Score;
 		}
 
 		void resetBall()
